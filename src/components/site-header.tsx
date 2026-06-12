@@ -14,9 +14,15 @@ export async function SiteHeader() {
           className="flex items-center gap-2 font-semibold tracking-tight"
         >
           <span className="inline-block size-2.5 rounded-full bg-primary" />
-          Research Platform
+          PubMed
         </Link>
         <nav className="flex items-center gap-1.5">
+          <Link
+            href="/projects"
+            className={buttonVariants({ variant: "ghost", size: "sm" })}
+          >
+            Projects
+          </Link>
           {user ? (
             <>
               <Link

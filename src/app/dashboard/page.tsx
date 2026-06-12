@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requireUser, ensureProfile } from "@/lib/auth";
 import { CAREER_STAGES } from "@/lib/profile";
+import { getProjectsByOwner } from "@/lib/queries/projects";
+import { ProjectCard } from "@/components/project-card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -13,6 +15,7 @@ import {
 export default async function DashboardPage() {
   const user = await requireUser();
   const profile = await ensureProfile(user);
+  const myProjects = await getProjectsByOwner(user.id);
 
   const stageLabel =
     CAREER_STAGES.find((s) => s.value === profile.careerStage)?.label ?? "Not set";
@@ -86,9 +89,42 @@ export default async function DashboardPage() {
         </CardContent>
       </Card>
 
-      <p className="mt-8 text-sm text-muted-foreground">
-        Next: browse and post research projects (Phase 2).
-      </p>
+      {/* My projects */}
+      <section className="mt-10">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold tracking-tight">My projects</h2>
+          <div className="flex gap-2">
+            <Link
+              href="/projects"
+              className={buttonVariants({ variant: "ghost", size: "sm" })}
+            >
+              Browse all
+            </Link>
+            {profile.canSupervise && (
+              <Link
+                href="/projects/new"
+                className={buttonVariants({ size: "sm" })}
+              >
+                Post a project
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {myProjects.length === 0 ? (
+          <p className="mt-4 rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+            {profile.canSupervise
+              ? "You haven’t posted any projects yet."
+              : "Browse open opportunities to find your first project."}
+          </p>
+        ) : (
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {myProjects.map((p) => (
+              <ProjectCard key={p.id} p={p} />
+            ))}
+          </div>
+        )}
+      </section>
     </main>
   );
 }

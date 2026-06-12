@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Research Platform — find research opportunities",
+  title: "PubMed — find research opportunities",
   description:
     "A UK platform connecting students and healthcare professionals with research opportunities, collaborators, and supervisors.",
 };

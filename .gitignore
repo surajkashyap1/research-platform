@@ -42,3 +42,7 @@ next-env.d.ts
 
 # Local Claude Code settings (personal, per-machine)
 .claude/settings.local.json
+
+# Third-party design skills (installed locally, not part of the product)
+.claude/skills/frontend-design/
+.claude/skills/ui-ux-pro-max/

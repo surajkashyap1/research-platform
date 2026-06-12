@@ -63,6 +63,19 @@ export async function ensureProfile(user: User): Promise<Profile> {
   return again[0];
 }
 
+// Posting projects is restricted to users with a verified supervisor email
+// (can_supervise). RLS is added before launch; this server check is the gate.
+// Returns both user and profile so callers can avoid a second lookup.
+export async function requireSupervisor(): Promise<{
+  user: User;
+  profile: Profile;
+}> {
+  const user = await requireUser();
+  const profile = await ensureProfile(user);
+  if (!profile.canSupervise) redirect("/projects/new");
+  return { user, profile };
+}
+
 export async function getProfile(userId: string): Promise<Profile | null> {
   const found = await db
     .select()
