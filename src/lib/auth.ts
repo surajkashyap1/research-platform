@@ -50,8 +50,17 @@ export async function ensureProfile(user: User): Promise<Profile> {
       isVerified: cls.isVerified,
       canSupervise: cls.canSupervise,
     })
+    .onConflictDoNothing()
     .returning();
-  return created;
+  if (created) return created;
+
+  // A concurrent request already created it — fetch and return that row.
+  const again = await db
+    .select()
+    .from(profiles)
+    .where(eq(profiles.id, user.id))
+    .limit(1);
+  return again[0];
 }
 
 export async function getProfile(userId: string): Promise<Profile | null> {

@@ -29,5 +29,8 @@ professionals with research opportunities (projects, audits, posters). Goal:
   RLS is a backstop, added before launch.
 - Application rate limit (3 / rolling 7 days) is computed in app logic, not a
   table — see `applications_applicant_time_idx`.
-- Run `npm run db:generate` after editing the Drizzle schema; `db:push` to apply
-  to the database during development.
+- Run `npm run db:generate` after editing the Drizzle schema, then
+  `npm run db:migrate` to apply (use migrate, not push — push needs a TTY).
+- Cross-schema FKs (e.g. profiles.id -> auth.users) can't be expressed in
+  Drizzle. They live in `drizzle/manual/*.sql` and are applied with
+  `node scripts/apply-sql.mjs <file>`. Re-run these on a fresh database.
