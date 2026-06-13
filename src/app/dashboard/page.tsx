@@ -37,7 +37,7 @@ export default async function DashboardPage() {
       {/* Verification + status badges */}
       <div className="mt-6 flex flex-wrap gap-2">
         {profile.isVerified ? (
-          <Badge className="border-transparent bg-emerald-600 text-white">
+          <Badge className="border-transparent bg-success text-success-foreground">
             ✓ Verified
           </Badge>
         ) : (

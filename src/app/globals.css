@@ -8,8 +8,8 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-mono: ui-monospace, "SFMono-Regular", "Menlo", monospace;
+  --font-heading: var(--font-serif);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -35,6 +35,8 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-success-foreground: var(--success-foreground);
+  --color-success: var(--success);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -52,75 +54,80 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
-/* Teal & emerald: clinical teal primary on mint-tinted neutrals.
-   Emerald (Tailwind emerald-600) remains the positive/"beginner" signal. */
+/* Scholarly Editorial: claret + ink on warm "paper" off-white.
+   Type and whitespace lead; claret is the single restrained accent;
+   teal-green --success carries verified / beginner-friendly / positive. */
 :root {
-  --radius: 0.5rem;
-  --background: oklch(0.940 0.013 202.9);
-  --foreground: oklch(0.326 0.046 206.4);
+  --radius: 0.375rem;
+  --background: oklch(0.985 0.004 91.4);
+  --foreground: oklch(0.273 0.021 216.1);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.326 0.046 206.4);
+  --card-foreground: oklch(0.273 0.021 216.1);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.326 0.046 206.4);
-  --primary: oklch(0.495 0.082 205.0);
-  --primary-foreground: oklch(0.983 0.007 197.0);
-  --secondary: oklch(0.915 0.019 200.9);
-  --secondary-foreground: oklch(0.389 0.053 204.5);
-  --muted: oklch(0.915 0.019 200.9);
-  --muted-foreground: oklch(0.496 0.033 204.4);
-  --accent: oklch(0.886 0.026 199.8);
-  --accent-foreground: oklch(0.326 0.046 206.4);
+  --popover-foreground: oklch(0.273 0.021 216.1);
+  --primary: oklch(0.410 0.107 23.0);
+  --primary-foreground: oklch(0.971 0.010 58.2);
+  --secondary: oklch(0.947 0.013 86.8);
+  --secondary-foreground: oklch(0.394 0.021 172.9);
+  --muted: oklch(0.947 0.013 86.8);
+  --muted-foreground: oklch(0.459 0.016 82.4);
+  --accent: oklch(0.929 0.016 86.4);
+  --accent-foreground: oklch(0.273 0.021 216.1);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.871 0.026 202.8);
-  --input: oklch(0.871 0.026 202.8);
-  --ring: oklch(0.495 0.082 205.0);
-  --chart-1: oklch(0.495 0.082 205.0);
-  --chart-2: oklch(0.600 0.104 184.7);
-  --chart-3: oklch(0.596 0.127 163.2);
-  --chart-4: oklch(0.797 0.134 211.5);
-  --chart-5: oklch(0.500 0.119 242.7);
-  --sidebar: oklch(0.925 0.017 201.4);
-  --sidebar-foreground: oklch(0.326 0.046 206.4);
-  --sidebar-primary: oklch(0.495 0.082 205.0);
-  --sidebar-primary-foreground: oklch(0.983 0.007 197.0);
-  --sidebar-accent: oklch(0.886 0.026 199.8);
-  --sidebar-accent-foreground: oklch(0.326 0.046 206.4);
-  --sidebar-border: oklch(0.871 0.026 202.8);
-  --sidebar-ring: oklch(0.495 0.082 205.0);
+  --success: oklch(0.489 0.082 184.8);
+  --success-foreground: oklch(1 0 0);
+  --border: oklch(0.905 0.017 84.6);
+  --input: oklch(0.872 0.020 84.6);
+  --ring: oklch(0.410 0.107 23.0);
+  --chart-1: oklch(0.410 0.107 23.0);
+  --chart-2: oklch(0.489 0.082 184.8);
+  --chart-3: oklch(0.650 0.109 75.7);
+  --chart-4: oklch(0.273 0.021 216.1);
+  --chart-5: oklch(0.555 0.101 27.1);
+  --sidebar: oklch(0.959 0.010 87.5);
+  --sidebar-foreground: oklch(0.273 0.021 216.1);
+  --sidebar-primary: oklch(0.410 0.107 23.0);
+  --sidebar-primary-foreground: oklch(0.971 0.010 58.2);
+  --sidebar-accent: oklch(0.929 0.016 86.4);
+  --sidebar-accent-foreground: oklch(0.273 0.021 216.1);
+  --sidebar-border: oklch(0.905 0.017 84.6);
+  --sidebar-ring: oklch(0.410 0.107 23.0);
 }
 
 .dark {
-  --background: oklch(0.210 0.021 211.8);
-  --foreground: oklch(0.952 0.013 191.0);
-  --card: oklch(0.257 0.029 210.6);
-  --card-foreground: oklch(0.952 0.013 191.0);
-  --popover: oklch(0.257 0.029 210.6);
-  --popover-foreground: oklch(0.952 0.013 191.0);
-  --primary: oklch(0.785 0.133 181.9);
-  --primary-foreground: oklch(0.273 0.044 187.7);
-  --secondary: oklch(0.327 0.036 206.7);
-  --secondary-foreground: oklch(0.952 0.013 191.0);
-  --muted: oklch(0.327 0.036 206.7);
-  --muted-foreground: oklch(0.762 0.029 196.5);
-  --accent: oklch(0.327 0.036 206.7);
-  --accent-foreground: oklch(0.952 0.013 191.0);
+  --background: oklch(0.234 0.014 188.6);
+  --foreground: oklch(0.927 0.016 82.8);
+  --card: oklch(0.266 0.016 182.7);
+  --card-foreground: oklch(0.927 0.016 82.8);
+  --popover: oklch(0.266 0.016 182.7);
+  --popover-foreground: oklch(0.927 0.016 82.8);
+  --primary: oklch(0.629 0.120 28.0);
+  --primary-foreground: oklch(0.186 0.018 31.5);
+  --secondary: oklch(0.307 0.015 175.2);
+  --secondary-foreground: oklch(0.927 0.016 82.8);
+  --muted: oklch(0.307 0.015 175.2);
+  --muted-foreground: oklch(0.709 0.016 77.0);
+  --accent: oklch(0.307 0.015 175.2);
+  --accent-foreground: oklch(0.927 0.016 82.8);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(0.369 0.038 208.8);
-  --input: oklch(0.369 0.038 208.8);
-  --ring: oklch(0.785 0.133 181.9);
-  --chart-1: oklch(0.785 0.133 181.9);
-  --chart-2: oklch(0.773 0.153 163.2);
-  --chart-3: oklch(0.797 0.134 211.5);
-  --chart-4: oklch(0.855 0.125 181.1);
-  --chart-5: oklch(0.754 0.139 232.7);
-  --sidebar: oklch(0.235 0.026 211.0);
-  --sidebar-foreground: oklch(0.952 0.013 191.0);
-  --sidebar-primary: oklch(0.785 0.133 181.9);
-  --sidebar-primary-foreground: oklch(0.273 0.044 187.7);
-  --sidebar-accent: oklch(0.327 0.036 206.7);
-  --sidebar-accent-foreground: oklch(0.952 0.013 191.0);
-  --sidebar-border: oklch(0.369 0.038 208.8);
-  --sidebar-ring: oklch(0.785 0.133 181.9);
+  --success: oklch(0.704 0.095 183.8);
+  --success-foreground: oklch(0.222 0.032 184.8);
+  --border: oklch(0.342 0.014 175.4);
+  --input: oklch(0.342 0.014 175.4);
+  --ring: oklch(0.629 0.120 28.0);
+  --chart-1: oklch(0.629 0.120 28.0);
+  --chart-2: oklch(0.704 0.095 183.8);
+  --chart-3: oklch(0.650 0.109 75.7);
+  --chart-4: oklch(0.927 0.016 82.8);
+  --chart-5: oklch(0.555 0.101 27.1);
+  --sidebar: oklch(0.266 0.016 182.7);
+  --sidebar-foreground: oklch(0.927 0.016 82.8);
+  --sidebar-primary: oklch(0.629 0.120 28.0);
+  --sidebar-primary-foreground: oklch(0.186 0.018 31.5);
+  --sidebar-accent: oklch(0.307 0.015 175.2);
+  --sidebar-accent-foreground: oklch(0.927 0.016 82.8);
+  --sidebar-border: oklch(0.342 0.014 175.4);
+  --sidebar-ring: oklch(0.629 0.120 28.0);
 }
 
 @layer base {
@@ -132,5 +139,18 @@ body {
   }
   html {
     @apply font-sans;
+  }
+  /* Serif display for real headings + the brand mark only — never UI controls. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+    /* Fraunces merges f+i (and similar) into quirky ligatures; headings are
+       short, so drop ligatures for cleaner, more conventional letterforms. */
+    font-variant-ligatures: none;
   }
 }

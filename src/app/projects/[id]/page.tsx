@@ -40,7 +40,7 @@ export default async function ProjectDetailPage({
 
       <div className="mt-3 flex flex-wrap gap-1.5">
         {project.isBeginnerFriendly && (
-          <Badge className="border-transparent bg-emerald-600 text-white">
+          <Badge className="border-transparent bg-success text-success-foreground">
             Beginner friendly
           </Badge>
         )}
@@ -77,7 +77,7 @@ export default async function ProjectDetailPage({
             <p className="mt-0.5 font-semibold">
               {project.ownerName ?? "Unknown"}
               {project.ownerVerified && (
-                <span className="ml-1 text-emerald-600" title="Verified">
+                <span className="ml-1 text-success" title="Verified">
                   ✓
                 </span>
               )}

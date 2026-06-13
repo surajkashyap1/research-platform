@@ -11,10 +11,9 @@ export async function SiteHeader() {
       <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 font-semibold tracking-tight"
+          className="font-heading text-xl font-semibold tracking-tight text-foreground transition-opacity hover:opacity-70"
         >
-          <span className="inline-block size-2.5 rounded-full bg-primary" />
-          PubMed
+          Incipit
         </Link>
         <nav className="flex items-center gap-1.5">
           <Link

@@ -14,7 +14,7 @@ export function ProjectCard({ p }: { p: ProjectListItem }) {
           {p.title}
         </h3>
         {p.isBeginnerFriendly && (
-          <Badge className="shrink-0 border-transparent bg-emerald-600 text-white">
+          <Badge className="shrink-0 border-transparent bg-success text-success-foreground">
             Beginner
           </Badge>
         )}
