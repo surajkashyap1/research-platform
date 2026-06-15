@@ -198,6 +198,11 @@ export type ConversationListItem = {
   unread: number;
 };
 
+function toDate(value: Date | string | null): Date | null {
+  if (!value) return null;
+  return value instanceof Date ? value : new Date(value);
+}
+
 export async function getConversationsForUser(
   userId: string
 ): Promise<ConversationListItem[]> {
@@ -223,7 +228,7 @@ export async function getConversationsForUser(
       and cp2.profile_id <> ${userId} limit 1
   )`.as("other_name");
 
-  return db
+  const rows = await db
     .select({
       id: conversations.id,
       type: conversations.type,
@@ -244,6 +249,11 @@ export async function getConversationsForUser(
     )
     .leftJoin(projects, eq(projects.id, conversations.projectId))
     .orderBy(sql`last_at desc nulls last`);
+
+  return rows.map((row) => ({
+    ...row,
+    lastAt: toDate(row.lastAt),
+  }));
 }
 
 export async function getUnreadMessageCount(userId: string): Promise<number> {

@@ -88,7 +88,6 @@ export async function sendMessage(formData: FormData) {
 
   revalidatePath(`/messages/${conversationId}`);
   revalidatePath("/messages");
-  redirect(`/messages/${conversationId}`);
 }
 
 // Mark every message from the other party as read. Called from the thread on

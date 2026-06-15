@@ -175,12 +175,63 @@ export default async function ApplicantsPage({
                     {a.skillsSummary && (
                       <div>
                         <dt className="text-xs font-medium text-muted-foreground">
-                          Skills
+                          Application skills
                         </dt>
                         <dd className="mt-0.5 whitespace-pre-wrap">
                           {a.skillsSummary}
                         </dd>
                       </div>
+                    )}
+                    <div>
+                      <dt className="text-xs font-medium text-muted-foreground">
+                        Time available for this project
+                      </dt>
+                      <dd className="mt-0.5">
+                        {a.hoursPerWeek != null
+                          ? `${a.hoursPerWeek} hrs/week`
+                          : "Not specified"}
+                      </dd>
+                    </div>
+                    {!anonymous && (
+                      <>
+                        <div>
+                          <dt className="text-xs font-medium text-muted-foreground">
+                            Profile skills
+                          </dt>
+                          <dd className="mt-0.5">
+                            {a.applicantSkills ?? "Not specified"}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs font-medium text-muted-foreground">
+                            Looking for project types
+                          </dt>
+                          <dd className="mt-0.5">
+                            {a.applicantPreferredProjectTypes ?? "Not specified"}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs font-medium text-muted-foreground">
+                            Preferred specialties
+                          </dt>
+                          <dd className="mt-0.5">
+                            {a.applicantPreferredSpecialties ?? "Not specified"}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs font-medium text-muted-foreground">
+                            Profile availability and certifications
+                          </dt>
+                          <dd className="mt-0.5">
+                            {a.applicantAvailabilityHoursPerWeek != null
+                              ? `${a.applicantAvailabilityHoursPerWeek} hrs/week`
+                              : "Availability not specified"}
+                            {" · "}
+                            {a.applicantCertificationCount} certification
+                            {a.applicantCertificationCount === 1 ? "" : "s"}
+                          </dd>
+                        </div>
+                      </>
                     )}
                   </dl>
 

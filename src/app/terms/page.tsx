@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import { Prose } from "@/components/prose";
 
 export const metadata: Metadata = {
-  title: "Terms of Use — Incipit",
-  description: "The terms governing your use of Incipit.",
+  title: "Terms of Use — Bylined",
+  description: "The terms governing your use of Bylined.",
 };
 
 export default function TermsPage() {
   return (
     <Prose title="Terms of Use" updated="June 2026">
       <p>
-        These terms govern your use of Incipit. By creating an account or using the
+        These terms govern your use of Bylined. By creating an account or using the
         platform, you agree to them and to our{" "}
         <a href="/ethos">Ethos &amp; usage policy</a>.{" "}
         <strong>This is a template and must be reviewed by a qualified
@@ -42,7 +42,7 @@ export default function TermsPage() {
 
       <h2>No guarantee of outcomes</h2>
       <p>
-        Incipit is a marketplace that connects people. We do not guarantee that you
+        Bylined is a marketplace that connects people. We do not guarantee that you
         will find a project, a collaborator, a supervisor, or a publication, and we
         are not a party to any agreement you make with other users. Authorship,
         supervision, and project arrangements are between you and your

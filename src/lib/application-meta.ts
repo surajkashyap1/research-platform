@@ -48,6 +48,7 @@ export function countWords(text: string): number {
 export function validateApplication(input: {
   motivation: string;
   suitability: string;
+  hoursPerWeek: number | null;
   skillsSummary: string;
 }): string | null {
   const motivation = input.motivation.trim();
@@ -56,6 +57,10 @@ export function validateApplication(input: {
 
   if (!motivation) return "Tell the supervisor why you're interested.";
   if (!suitability) return "Tell the supervisor why you're suitable.";
+  if (input.hoursPerWeek == null || input.hoursPerWeek <= 0)
+    return "Tell the supervisor how much time you can dedicate per week.";
+  if (input.hoursPerWeek > 80)
+    return "Weekly time commitment must be 80 hours or fewer.";
   if (countWords(motivation) > WORD_LIMITS.motivation)
     return `Motivation must be ${WORD_LIMITS.motivation} words or fewer.`;
   if (countWords(suitability) > WORD_LIMITS.suitability)

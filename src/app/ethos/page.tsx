@@ -2,19 +2,19 @@ import type { Metadata } from "next";
 import { Prose } from "@/components/prose";
 
 export const metadata: Metadata = {
-  title: "Ethos & Usage Policy — Incipit",
+  title: "Ethos & Usage Policy — Bylined",
   description:
-    "How we build trust, prevent spam, and keep Incipit welcoming to beginners.",
+    "How we build trust, prevent spam, and keep Bylined welcoming to beginners.",
 };
 
 export default function EthosPage() {
   return (
     <Prose
       title="Ethos & usage policy"
-      intro="The principles that keep Incipit fair, trustworthy and welcoming."
+      intro="The principles that keep Bylined fair, trustworthy and welcoming."
     >
       <p>
-        This platform is free to use for everyone. By using Incipit you agree to
+        This platform is free to use for everyone. By using Bylined you agree to
         take part in good faith — apply to projects you genuinely intend to
         complete, communicate honestly, and treat collaborators and supervisors
         with respect.

@@ -3,15 +3,23 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
-import { profiles } from "@/db/schema";
+import { profileCertifications, profiles, profileSkills, skills } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { ensureProfile, requireUser } from "@/lib/auth";
-import { computeCompleteness, CAREER_STAGES, type Profile } from "@/lib/profile";
+import {
+  computeCompleteness,
+  CAREER_STAGES,
+  parseHoursPerWeek,
+  parseListText,
+  parseSkillNames,
+  type Profile,
+} from "@/lib/profile";
+import { getOptionalFile, uploadProfileAsset } from "@/lib/storage";
 
 export async function login(formData: FormData) {
-  const email = String(formData.get("email") ?? "");
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
   const next = String(formData.get("next") ?? "/dashboard");
 
@@ -25,9 +33,22 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
-  const email = String(formData.get("email") ?? "");
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
-  const fullName = String(formData.get("fullName") ?? "");
+  const fullName = String(formData.get("fullName") ?? "").trim();
+
+  const existingProfile = await db
+    .select({ id: profiles.id })
+    .from(profiles)
+    .where(eq(profiles.email, email))
+    .limit(1);
+  if (existingProfile.length > 0) {
+    redirect(
+      `/signup?error=${encodeURIComponent(
+        "An account already exists for this email. Log in instead."
+      )}`
+    );
+  }
 
   const supabase = await createClient();
   const origin = (await headers()).get("origin") ?? "";
@@ -42,6 +63,15 @@ export async function signup(formData: FormData) {
 
   if (error) {
     redirect(`/signup?error=${encodeURIComponent(error.message)}`);
+  }
+
+  const identities = data.user?.identities;
+  if (identities && identities.length === 0) {
+    redirect(
+      `/signup?error=${encodeURIComponent(
+        "An account already exists for this email. Log in instead."
+      )}`
+    );
   }
 
   // If email confirmation is disabled, we get a session immediately.
@@ -72,22 +102,121 @@ export async function updateProfile(formData: FormData) {
     VALID_STAGES.has(stageRaw as Profile["careerStage"]) ? stageRaw : "other"
   ) as Profile["careerStage"];
 
+  const avatarFile = getOptionalFile(formData, "avatar");
+  let avatarUrl = String(formData.get("existingAvatarUrl") ?? "").trim() || null;
+  if (avatarFile) {
+    try {
+      avatarUrl = await uploadProfileAsset({
+        userId: user.id,
+        file: avatarFile,
+        folder: "avatars",
+      });
+    } catch (error) {
+      redirect(
+        `/onboarding?error=${encodeURIComponent(
+          error instanceof Error ? error.message : "Could not upload profile picture."
+        )}`
+      );
+    }
+  }
+
   const fields = {
     fullName: String(formData.get("fullName") ?? "").trim(),
     university: String(formData.get("university") ?? "").trim() || null,
     specialty: String(formData.get("specialty") ?? "").trim() || null,
     summary: String(formData.get("summary") ?? "").trim() || null,
-    availability: String(formData.get("availability") ?? "").trim() || null,
+    availability: null,
+    availabilityHoursPerWeek: parseHoursPerWeek(
+      formData.get("availabilityHoursPerWeek")
+    ),
+    avatarUrl,
+    preferredProjectTypes: parseListText(formData.get("preferredProjectTypes")),
+    preferredSpecialties: parseListText(formData.get("preferredSpecialties")),
     careerStage,
   };
 
   const completeness = computeCompleteness(fields as Partial<Profile>);
 
-  await db
-    .update(profiles)
-    .set({ ...fields, profileCompleteness: completeness, updatedAt: new Date() })
-    .where(eq(profiles.id, user.id));
+  const skillNames = parseSkillNames(formData.get("skills"));
+  const certNames = formData
+    .getAll("certName")
+    .map((value) => String(value ?? "").trim());
+  const existingProofUrls = formData
+    .getAll("certProofUrl")
+    .map((value) => String(value ?? "").trim());
+  const proofFiles = formData.getAll("certProofFile");
+
+  const certifications: { name: string; proofUrl: string | null }[] = [];
+  for (let i = 0; i < certNames.length; i++) {
+    const name = certNames[i];
+    if (!name) continue;
+
+    let proofUrl = existingProofUrls[i] || null;
+    const proofFile = proofFiles[i];
+    if (proofFile instanceof File && proofFile.size > 0) {
+      try {
+        proofUrl = await uploadProfileAsset({
+          userId: user.id,
+          file: proofFile,
+          folder: "certifications",
+        });
+      } catch (error) {
+        redirect(
+          `/onboarding?error=${encodeURIComponent(
+            error instanceof Error
+              ? error.message
+              : "Could not upload certificate proof."
+          )}`
+        );
+      }
+    }
+
+    certifications.push({ name, proofUrl });
+  }
+
+  await db.transaction(async (tx) => {
+    await tx
+      .update(profiles)
+      .set({ ...fields, profileCompleteness: completeness, updatedAt: new Date() })
+      .where(eq(profiles.id, user.id));
+
+    await tx.delete(profileSkills).where(eq(profileSkills.profileId, user.id));
+    if (skillNames.length > 0) {
+      await tx
+        .insert(skills)
+        .values(skillNames.map((name) => ({ name })))
+        .onConflictDoNothing();
+
+      const skillRows = await tx
+        .select({ id: skills.id })
+        .from(skills)
+        .where(inArray(skills.name, skillNames));
+
+      if (skillRows.length > 0) {
+        await tx.insert(profileSkills).values(
+          skillRows.map((skill) => ({
+            profileId: user.id,
+            skillId: skill.id,
+          }))
+        );
+      }
+    }
+
+    await tx
+      .delete(profileCertifications)
+      .where(eq(profileCertifications.profileId, user.id));
+    if (certifications.length > 0) {
+      await tx.insert(profileCertifications).values(
+        certifications.map((certification) => ({
+          profileId: user.id,
+          name: certification.name,
+          proofUrl: certification.proofUrl,
+        }))
+      );
+    }
+  });
 
   revalidatePath("/dashboard");
+  revalidatePath(`/profile/${user.id}`);
   redirect("/dashboard");
 }

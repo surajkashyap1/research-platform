@@ -60,6 +60,9 @@ create table profiles (
   is_new_researcher   boolean not null default true,   -- no completed projects yet
   reliability_score   numeric(3,2),                -- 0.00-5.00, aggregated; null until rated
   availability        text,                        -- e.g. hours/week, free text for MVP
+  availability_hours_per_week int,
+  preferred_project_types text,                    -- comma-separated project types sought
+  preferred_specialties text,                      -- comma-separated specialties sought
   profile_completeness int not null default 0,     -- 0-100, computed app-side
   created_at          timestamptz not null default now(),
   updated_at          timestamptz not null default now()
@@ -77,6 +80,17 @@ create table profile_skills (
   skill_id    int  references skills(id)   on delete cascade,
   primary key (profile_id, skill_id)
 );
+
+create table profile_certifications (
+  id          uuid primary key default gen_random_uuid(),
+  profile_id  uuid not null references profiles(id) on delete cascade,
+  name        text not null,
+  proof_url   text,
+  created_at  timestamptz not null default now()
+);
+
+create index profile_certifications_profile_idx
+  on profile_certifications (profile_id);
 
 
 -- Existing publications shown on a profile --------------------------
@@ -140,6 +154,7 @@ create table applications (
   status        application_status not null default 'pending',
   motivation    text not null,        -- reasons for applying / interests
   suitability   text not null,        -- why suitable for the role
+  hours_per_week int,                  -- weekly time the applicant can dedicate
   skills_summary text,                -- relevant skills
   created_at    timestamptz not null default now(),
   unique (project_id, applicant_id)   -- one application per project per user

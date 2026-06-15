@@ -4,6 +4,7 @@ import { useState } from "react";
 import { submitApplication } from "@/app/applications/actions";
 import { WORD_LIMITS, countWords } from "@/lib/application-meta";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -28,13 +29,14 @@ export function ApplicationForm({
 }) {
   const [motivation, setMotivation] = useState("");
   const [suitability, setSuitability] = useState("");
+  const [hoursPerWeek, setHoursPerWeek] = useState("");
   const [skills, setSkills] = useState("");
 
   const overLimit =
     countWords(motivation) > WORD_LIMITS.motivation ||
     countWords(suitability) > WORD_LIMITS.suitability ||
     countWords(skills) > WORD_LIMITS.skillsSummary;
-  const empty = !motivation.trim() || !suitability.trim();
+  const empty = !motivation.trim() || !suitability.trim() || !hoursPerWeek.trim();
 
   return (
     <form action={submitApplication} className="flex flex-col gap-5">
@@ -42,7 +44,7 @@ export function ApplicationForm({
 
       <div className="grid gap-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="motivation">Why are you interested?</Label>
+          <Label htmlFor="motivation">Why are you interested in this role?</Label>
           <WordCounter value={motivation} max={WORD_LIMITS.motivation} />
         </div>
         <Textarea
@@ -58,7 +60,7 @@ export function ApplicationForm({
 
       <div className="grid gap-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="suitability">Why are you suitable?</Label>
+          <Label htmlFor="suitability">Why are you suitable for the role?</Label>
           <WordCounter value={suitability} max={WORD_LIMITS.suitability} />
         </div>
         <Textarea
@@ -69,6 +71,22 @@ export function ApplicationForm({
           value={suitability}
           onChange={(e) => setSuitability(e.target.value)}
           placeholder="Relevant experience, reliability, and what you'd bring to the team."
+        />
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="hoursPerWeek">How much time can you dedicate per week?</Label>
+        <Input
+          id="hoursPerWeek"
+          name="hoursPerWeek"
+          type="number"
+          min="1"
+          max="80"
+          step="1"
+          required
+          value={hoursPerWeek}
+          onChange={(e) => setHoursPerWeek(e.target.value)}
+          placeholder="e.g. 5"
         />
       </div>
 

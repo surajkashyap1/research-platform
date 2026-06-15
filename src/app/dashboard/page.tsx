@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser, ensureProfile } from "@/lib/auth";
 import { CAREER_STAGES } from "@/lib/profile";
 import { getProjectsByOwner } from "@/lib/queries/projects";
+import { getProfileCertifications, getProfileSkills } from "@/lib/queries/profiles";
 import { ProjectCard } from "@/components/project-card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -15,7 +16,11 @@ import {
 export default async function DashboardPage() {
   const user = await requireUser();
   const profile = await ensureProfile(user);
-  const myProjects = await getProjectsByOwner(user.id);
+  const [myProjects, skillNames, certifications] = await Promise.all([
+    getProjectsByOwner(user.id),
+    getProfileSkills(user.id),
+    getProfileCertifications(user.id),
+  ]);
 
   const stageLabel =
     CAREER_STAGES.find((s) => s.value === profile.careerStage)?.label ?? "Not set";
@@ -23,11 +28,24 @@ export default async function DashboardPage() {
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-12">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Hi, {profile.fullName}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">{profile.email}</p>
+        <div className="flex items-center gap-4">
+          {profile.avatarUrl ? (
+            <img
+              src={profile.avatarUrl}
+              alt=""
+              className="h-14 w-14 rounded-full border object-cover"
+            />
+          ) : (
+            <div className="flex h-14 w-14 items-center justify-center rounded-full border bg-muted text-lg font-semibold text-muted-foreground">
+              {profile.fullName.slice(0, 1).toUpperCase()}
+            </div>
+          )}
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Hi, {profile.fullName}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">{profile.email}</p>
+          </div>
         </div>
         <div className="flex shrink-0 gap-2">
           <Link
@@ -91,9 +109,41 @@ export default async function DashboardPage() {
             </div>
             <div>
               <dt className="text-muted-foreground">Availability</dt>
-              <dd className="mt-0.5 font-medium">{profile.availability ?? "—"}</dd>
+              <dd className="mt-0.5 font-medium">
+                {profile.availabilityHoursPerWeek != null
+                  ? `${profile.availabilityHoursPerWeek} hrs/week`
+                  : "—"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-muted-foreground">Looking for</dt>
+              <dd className="mt-0.5 font-medium">
+                {profile.preferredProjectTypes ?? "—"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-muted-foreground">Preferred specialties</dt>
+              <dd className="mt-0.5 font-medium">
+                {profile.preferredSpecialties ?? "—"}
+              </dd>
             </div>
           </dl>
+          <div className="mt-6 grid gap-4 text-sm sm:grid-cols-2">
+            <div>
+              <p className="text-muted-foreground">Skills</p>
+              <p className="mt-0.5 font-medium">
+                {skillNames.length > 0 ? skillNames.join(", ") : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Certifications</p>
+              <p className="mt-0.5 font-medium">
+                {certifications.length > 0
+                  ? certifications.map((certification) => certification.name).join(", ")
+                  : "—"}
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

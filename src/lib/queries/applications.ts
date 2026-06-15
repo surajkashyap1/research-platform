@@ -1,6 +1,14 @@
 import { and, count, desc, eq, gte, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { applications, projects, profiles, reviews } from "@/db/schema";
+import {
+  applications,
+  profileCertifications,
+  profileSkills,
+  projects,
+  profiles,
+  reviews,
+  skills,
+} from "@/db/schema";
 import {
   APPLICATION_WINDOW_DAYS,
   BASE_APPLICATION_LIMIT,
@@ -149,6 +157,7 @@ export type ApplicantItem = {
   createdAt: Date;
   motivation: string;
   suitability: string;
+  hoursPerWeek: number | null;
   skillsSummary: string | null;
   applicantId: string;
   applicantName: string | null;
@@ -156,6 +165,11 @@ export type ApplicantItem = {
   applicantCareerStage: string;
   applicantVerified: boolean;
   applicantNewResearcher: boolean;
+  applicantAvailabilityHoursPerWeek: number | null;
+  applicantPreferredProjectTypes: string | null;
+  applicantPreferredSpecialties: string | null;
+  applicantSkills: string | null;
+  applicantCertificationCount: number;
 };
 
 export type ProjectRankMeta = {
@@ -178,6 +192,16 @@ export async function getRankedApplicantsForProject(
     where rv.reviewee_id = ${profiles.id}
       and rv.direction = 'supervisor_to_member'
   )`;
+  const applicantSkills = sql<string | null>`(
+    select string_agg(sk.name, ', ' order by sk.name)
+    from ${profileSkills} ps
+    inner join ${skills} sk on sk.id = ps.skill_id
+    where ps.profile_id = ${profiles.id}
+  )`;
+  const applicantCertificationCount = sql<number>`(
+    select count(*)::int from ${profileCertifications} pc
+    where pc.profile_id = ${profiles.id}
+  )`;
 
   const rows = await db
     .select({
@@ -186,6 +210,7 @@ export async function getRankedApplicantsForProject(
       createdAt: applications.createdAt,
       motivation: applications.motivation,
       suitability: applications.suitability,
+      hoursPerWeek: applications.hoursPerWeek,
       skillsSummary: applications.skillsSummary,
       applicantId: profiles.id,
       applicantName: profiles.fullName,
@@ -193,9 +218,13 @@ export async function getRankedApplicantsForProject(
       applicantCareerStage: profiles.careerStage,
       applicantVerified: profiles.isVerified,
       applicantNewResearcher: profiles.isNewResearcher,
+      applicantAvailabilityHoursPerWeek: profiles.availabilityHoursPerWeek,
+      applicantPreferredProjectTypes: profiles.preferredProjectTypes,
+      applicantPreferredSpecialties: profiles.preferredSpecialties,
+      applicantSkills,
+      applicantCertificationCount,
       reliabilityScore: profiles.reliabilityScore,
       profileCompleteness: profiles.profileCompleteness,
-      availability: profiles.availability,
       applicantSpecialty: profiles.specialty,
       reviewCount,
     })
@@ -219,9 +248,11 @@ export async function getRankedApplicantsForProject(
         reviewCount: r.reviewCount,
         isNewResearcher: r.applicantNewResearcher,
         profileCompleteness: r.profileCompleteness,
-        hasAvailability: !!r.availability?.trim(),
+        hasAvailability:
+          r.applicantAvailabilityHoursPerWeek != null &&
+          r.applicantAvailabilityHoursPerWeek > 0,
         applicantSpecialty: r.applicantSpecialty,
-        skillsSummary: r.skillsSummary,
+        skillsSummary: [r.skillsSummary, r.applicantSkills].filter(Boolean).join(", "),
         motivationWords: countWords(`${r.motivation} ${r.suitability}`),
         beginnerFriendly: project.isBeginnerFriendly,
         projectSpecialty: project.specialty,
@@ -233,6 +264,7 @@ export async function getRankedApplicantsForProject(
         createdAt: r.createdAt,
         motivation: r.motivation,
         suitability: r.suitability,
+        hoursPerWeek: r.hoursPerWeek,
         skillsSummary: r.skillsSummary,
         applicantId: r.applicantId,
         applicantName: r.applicantName,
@@ -240,6 +272,11 @@ export async function getRankedApplicantsForProject(
         applicantCareerStage: r.applicantCareerStage,
         applicantVerified: r.applicantVerified,
         applicantNewResearcher: r.applicantNewResearcher,
+        applicantAvailabilityHoursPerWeek: r.applicantAvailabilityHoursPerWeek,
+        applicantPreferredProjectTypes: r.applicantPreferredProjectTypes,
+        applicantPreferredSpecialties: r.applicantPreferredSpecialties,
+        applicantSkills: r.applicantSkills,
+        applicantCertificationCount: r.applicantCertificationCount,
         ranking,
       };
     })

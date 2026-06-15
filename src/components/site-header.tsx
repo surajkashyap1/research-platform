@@ -22,7 +22,7 @@ export async function SiteHeader() {
           href="/"
           className="shrink-0 font-heading text-xl font-semibold tracking-tight text-foreground transition-opacity hover:opacity-70"
         >
-          Incipit
+          Bylined
         </Link>
         <nav className="flex items-center gap-1.5 overflow-x-auto overflow-y-hidden py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0">
           <Link
@@ -53,13 +53,13 @@ export async function SiteHeader() {
               <Link
                 href="/notifications"
                 aria-label={`Notifications${unreadNotifications > 0 ? ` (${unreadNotifications} unread)` : ""}`}
-                className={`relative ${buttonVariants({ variant: "ghost", size: "icon" })}`}
+                className={`relative ${buttonVariants({ variant: "ghost", size: "sm" })}`}
               >
-                <span aria-hidden>🔔</span>
+                Notifications
                 {unreadNotifications > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
+                  <Badge className="ml-1.5 border-transparent bg-primary px-1.5 text-primary-foreground">
                     {unreadNotifications}
-                  </span>
+                  </Badge>
                 )}
               </Link>
               <Link

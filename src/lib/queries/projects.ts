@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { projects, profiles, applications } from "@/db/schema";
 import type {
@@ -27,6 +27,8 @@ const listColumns = {
   applicationDeadline: projects.applicationDeadline,
   createdAt: projects.createdAt,
   ownerName: profiles.fullName,
+  ownerUniversity: profiles.university,
+  ownerCareerStage: profiles.careerStage,
   applicationCount,
 };
 
@@ -45,17 +47,19 @@ export type ProjectListItem = {
   applicationDeadline: string | null;
   createdAt: Date;
   ownerName: string | null;
+  ownerUniversity: string | null;
+  ownerCareerStage: string | null;
   applicationCount: number;
 };
 
-export type ProjectTab = "all" | "beginner" | "competitive";
+export type CompetitivenessRank = "beginner_first" | "competitive_first";
 
 export type ListProjectsOptions = {
   q?: string;
   specialty?: string;
   type?: ProjectType;
   experience?: ExperienceLevel;
-  tab?: ProjectTab;
+  rank?: CompetitivenessRank;
 };
 
 export async function listOpenProjects(
@@ -77,18 +81,12 @@ export async function listOpenProjects(
   if (opts.type) conds.push(eq(projects.projectType, opts.type));
   if (opts.experience) conds.push(eq(projects.experienceLevel, opts.experience));
 
-  if (opts.tab === "beginner") {
-    conds.push(
-      or(
-        eq(projects.experienceLevel, "beginner_welcome"),
-        eq(projects.isBeginnerFriendly, true)
-      )!
-    );
-  } else if (opts.tab === "competitive") {
-    conds.push(
-      inArray(projects.experienceLevel, ["some_experience", "experienced_only"])
-    );
-  }
+  const beginnerRank = sql<number>`case when ${projects.isBeginnerFriendly} or ${projects.experienceLevel} = 'beginner_welcome' then 1 else 0 end`;
+  const competitiveRank = sql<number>`case when ${projects.experienceLevel} in ('some_experience', 'experienced_only') and ${projects.isBeginnerFriendly} = false then 1 else 0 end`;
+  const rankOrder =
+    opts.rank === "competitive_first"
+      ? desc(competitiveRank)
+      : desc(beginnerRank);
 
   return db
     .select(listColumns)
@@ -96,7 +94,7 @@ export async function listOpenProjects(
     .leftJoin(profiles, eq(profiles.id, projects.ownerId))
     // Beginner-friendly listings get higher visibility (ROADMAP §9/§11).
     .where(and(...conds))
-    .orderBy(desc(projects.isBeginnerFriendly), desc(projects.createdAt));
+    .orderBy(rankOrder, desc(projects.createdAt));
 }
 
 const UUID_RE =
@@ -121,6 +119,7 @@ export async function getProjectById(id: string) {
       updatedAt: projects.updatedAt,
       supervisorId: projects.supervisorId,
       ownerUniversity: profiles.university,
+      ownerCareerStage: profiles.careerStage,
       ownerVerified: profiles.isVerified,
     })
     .from(projects)

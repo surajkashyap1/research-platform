@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getSessionUser, getProfile } from "@/lib/auth";
 import {
   listOpenProjects,
-  type ProjectTab,
+  type CompetitivenessRank,
 } from "@/lib/queries/projects";
 import { ProjectCard } from "@/components/project-card";
 import {
@@ -22,13 +22,15 @@ type SP = {
   specialty?: string;
   type?: string;
   experience?: string;
-  tab?: string;
+  rank?: string;
 };
 
-const TABS: { value: ProjectTab; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "beginner", label: "Beginner roles" },
-  { value: "competitive", label: "Competitive roles" },
+const COMPETITIVENESS_RANKS: {
+  value: CompetitivenessRank;
+  label: string;
+}[] = [
+  { value: "beginner_first", label: "Beginner-friendly first" },
+  { value: "competitive_first", label: "Competitive first" },
 ];
 
 export default async function ProjectsPage({
@@ -40,11 +42,9 @@ export default async function ProjectsPage({
   const user = await getSessionUser();
   const canSupervise = user ? (await getProfile(user.id))?.canSupervise ?? false : false;
 
-  const tab: ProjectTab = (["all", "beginner", "competitive"] as const).includes(
-    sp.tab as ProjectTab
-  )
-    ? (sp.tab as ProjectTab)
-    : "all";
+  const rank = COMPETITIVENESS_RANKS.some((r) => r.value === sp.rank)
+    ? (sp.rank as CompetitivenessRank)
+    : "beginner_first";
   const type = PROJECT_TYPE_VALUES.has(sp.type as ProjectType)
     ? (sp.type as ProjectType)
     : undefined;
@@ -54,18 +54,7 @@ export default async function ProjectsPage({
   const q = sp.q?.trim() || undefined;
   const specialty = sp.specialty?.trim() || undefined;
 
-  const projects = await listOpenProjects({ q, specialty, type, experience, tab });
-
-  const tabHref = (t: ProjectTab) => {
-    const params = new URLSearchParams();
-    if (q) params.set("q", q);
-    if (specialty) params.set("specialty", specialty);
-    if (type) params.set("type", type);
-    if (experience) params.set("experience", experience);
-    if (t !== "all") params.set("tab", t);
-    const qs = params.toString();
-    return qs ? `/projects?${qs}` : "/projects";
-  };
+  const projects = await listOpenProjects({ q, specialty, type, experience, rank });
 
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
@@ -83,26 +72,8 @@ export default async function ProjectsPage({
         )}
       </div>
 
-      {/* Tabs */}
-      <nav className="mt-6 flex gap-1 border-b">
-        {TABS.map((t) => (
-          <Link
-            key={t.value}
-            href={tabHref(t.value)}
-            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium ${
-              tab === t.value
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {t.label}
-          </Link>
-        ))}
-      </nav>
-
       {/* Filters (GET form) */}
-      <form className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <input type="hidden" name="tab" value={tab} />
+      <form className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Input name="q" placeholder="Search title or description" defaultValue={q ?? ""} />
         <Input name="specialty" placeholder="Specialty" defaultValue={specialty ?? ""} />
         <Select
@@ -110,12 +81,17 @@ export default async function ProjectsPage({
           defaultValue={type ?? ""}
           options={[{ value: "", label: "Any type" }, ...PROJECT_TYPES]}
         />
+        <Select
+          name="experience"
+          defaultValue={experience ?? ""}
+          options={[{ value: "", label: "Any level" }, ...EXPERIENCE_LEVELS]}
+        />
         <div className="flex gap-2">
           <Select
-            name="experience"
-            defaultValue={experience ?? ""}
+            name="rank"
+            defaultValue={rank}
             className="flex-1"
-            options={[{ value: "", label: "Any level" }, ...EXPERIENCE_LEVELS]}
+            options={COMPETITIVENESS_RANKS}
           />
           <Button type="submit" variant="outline">
             Filter

@@ -11,12 +11,10 @@ export default async function Home() {
         UK · students &amp; healthcare professionals
       </span>
       <h1 className="mt-5 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-        The easiest way to get your first publication.
+        Bringing research to you
       </h1>
       <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-        A platform connecting students and healthcare professionals with research
-        opportunities, collaborators, and supervisors — not just for the
-        well-connected.
+        Find opportunities, build networks, and advance your career.
       </p>
 
       <div className="mt-8 flex gap-3">

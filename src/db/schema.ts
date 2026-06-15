@@ -84,6 +84,9 @@ export const profiles = pgTable("profiles", {
   isNewResearcher: boolean("is_new_researcher").notNull().default(true),
   reliabilityScore: numeric("reliability_score", { precision: 3, scale: 2 }),
   availability: text("availability"),
+  availabilityHoursPerWeek: integer("availability_hours_per_week"),
+  preferredProjectTypes: text("preferred_project_types"),
+  preferredSpecialties: text("preferred_specialties"),
   profileCompleteness: integer("profile_completeness").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -98,6 +101,14 @@ export const profileSkills = pgTable("profile_skills", {
   profileId: uuid("profile_id").notNull().references(() => profiles.id, { onDelete: "cascade" }),
   skillId: integer("skill_id").notNull().references(() => skills.id, { onDelete: "cascade" }),
 }, (t) => [primaryKey({ columns: [t.profileId, t.skillId] })]);
+
+export const profileCertifications = pgTable("profile_certifications", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  profileId: uuid("profile_id").notNull().references(() => profiles.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  proofUrl: text("proof_url"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [index("profile_certifications_profile_idx").on(t.profileId)]);
 
 export const publications = pgTable("publications", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -151,6 +162,7 @@ export const applications = pgTable("applications", {
   status: applicationStatus("status").notNull().default("pending"),
   motivation: text("motivation").notNull(),
   suitability: text("suitability").notNull(),
+  hoursPerWeek: integer("hours_per_week"),
   skillsSummary: text("skills_summary"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [

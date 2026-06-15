@@ -1,5 +1,20 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import {
+  BookOpen,
+  Briefcase,
+  CalendarDays,
+  ClipboardList,
+  FileText,
+  GraduationCap,
+  HelpCircle,
+  Presentation,
+  Search,
+  Stethoscope,
+  UserPlus,
+  Users,
+} from "lucide-react";
+import type { ComponentType, ReactNode, SVGProps } from "react";
 import { getSessionUser } from "@/lib/auth";
 import { getProjectById } from "@/lib/queries/projects";
 import {
@@ -11,11 +26,53 @@ import { closeProject, reopenProject, completeProject } from "@/app/projects/act
 import { openConversation } from "@/app/messages/actions";
 import { projectTypeLabel, experienceLabel } from "@/lib/project-meta";
 import { STATUS_LABELS, STATUS_BADGE_CLASS } from "@/lib/application-meta";
+import { CAREER_STAGES } from "@/lib/profile";
 import { ApplicationForm } from "@/components/application-form";
 import { ListingQA } from "@/components/listing-qa";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+
+type Icon = ComponentType<SVGProps<SVGSVGElement>>;
+
+const TYPE_ICONS: Record<string, Icon> = {
+  audit: ClipboardList,
+  systematic_review: Search,
+  literature_review: BookOpen,
+  case_study: FileText,
+  retrospective: BookOpen,
+  prospective_study: ClipboardList,
+  poster: Presentation,
+  teaching: GraduationCap,
+  other: HelpCircle,
+};
+
+function careerStageLabel(value: string | null) {
+  if (!value) return null;
+  return CAREER_STAGES.find((stage) => stage.value === value)?.label ?? value;
+}
+
+function DetailField({
+  icon: IconComponent,
+  label,
+  value,
+  className,
+}: {
+  icon: Icon;
+  label: string;
+  value: ReactNode;
+  className: string;
+}) {
+  return (
+    <div className={`rounded-md border px-3 py-2 ${className}`}>
+      <p className="flex items-center gap-1.5 text-xs font-medium">
+        <IconComponent className="h-3.5 w-3.5" aria-hidden />
+        {label}
+      </p>
+      <div className="mt-1 text-sm font-semibold text-foreground">{value}</div>
+    </div>
+  );
+}
 
 export default async function ProjectDetailPage({
   params,
@@ -31,6 +88,8 @@ export default async function ProjectDetailPage({
 
   const user = await getSessionUser();
   const isOwner = user?.id === project.ownerId;
+  const ProjectTypeIcon = TYPE_ICONS[project.projectType] ?? HelpCircle;
+  const ownerRole = careerStageLabel(project.ownerCareerStage);
 
   const [myApplication, allowance, questions] = await Promise.all([
     user && !isOwner ? getMyApplication(id, user.id) : Promise.resolve(null),
@@ -90,34 +149,66 @@ export default async function ProjectDetailPage({
       </p>
 
       <Card className="mt-8">
-        <CardContent className="grid grid-cols-2 gap-x-4 gap-y-4 text-sm sm:grid-cols-4">
-          <div>
-            <p className="text-muted-foreground">Applications</p>
-            <p className="mt-0.5 font-semibold">{project.applicationCount}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Positions</p>
-            <p className="mt-0.5 font-semibold">{project.positionsAvailable}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Deadline</p>
-            <p className="mt-0.5 font-semibold">
-              {project.applicationDeadline ?? "—"}
-            </p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Posted by</p>
-            <p className="mt-0.5 font-semibold">
+        <CardContent className="grid gap-3 text-sm sm:grid-cols-2">
+          <DetailField
+            icon={ProjectTypeIcon}
+            label="Project type"
+            value={projectTypeLabel(project.projectType)}
+            className="border-sky-200 bg-sky-50 dark:border-sky-900/60 dark:bg-sky-950/40"
+          />
+          <DetailField
+            icon={GraduationCap}
+            label="Experience level"
+            value={experienceLabel(project.experienceLevel)}
+            className="border-amber-200 bg-amber-50 dark:border-amber-900/60 dark:bg-amber-950/40"
+          />
+          <DetailField
+            icon={Stethoscope}
+            label="Specialty"
+            value={project.specialty ?? "—"}
+            className="border-emerald-200 bg-emerald-50 dark:border-emerald-900/60 dark:bg-emerald-950/40"
+          />
+          <DetailField
+            icon={Briefcase}
+            label="Role"
+            value={project.roleCategory ?? "—"}
+            className="border-violet-200 bg-violet-50 dark:border-violet-900/60 dark:bg-violet-950/40"
+          />
+          <DetailField
+            icon={Users}
+            label="Applications"
+            value={project.applicationCount}
+            className="border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900"
+          />
+          <DetailField
+            icon={UserPlus}
+            label="Positions"
+            value={project.positionsAvailable}
+            className="border-teal-200 bg-teal-50 dark:border-teal-900/60 dark:bg-teal-950/40"
+          />
+          <DetailField
+            icon={CalendarDays}
+            label="Application Deadline"
+            value={project.applicationDeadline ?? "—"}
+            className="border-rose-200 bg-rose-50 dark:border-rose-900/60 dark:bg-rose-950/40"
+          />
+          <DetailField
+            icon={Briefcase}
+            label="Posted by"
+            value={
               <Link href={`/profile/${project.ownerId}`} className="hover:underline">
                 {project.ownerName ?? "Unknown"}
+                {project.ownerUniversity ? `, ${project.ownerUniversity}` : ""}
+                {ownerRole ? `, ${ownerRole}` : ""}
+                {project.ownerVerified && (
+                  <span className="ml-1 text-success" title="Verified">
+                    ✓
+                  </span>
+                )}
               </Link>
-              {project.ownerVerified && (
-                <span className="ml-1 text-success" title="Verified">
-                  ✓
-                </span>
-              )}
-            </p>
-          </div>
+            }
+            className="border-indigo-200 bg-indigo-50 dark:border-indigo-900/60 dark:bg-indigo-950/40"
+          />
         </CardContent>
       </Card>
 

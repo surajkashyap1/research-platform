@@ -8,6 +8,7 @@ import { applications, projects } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
 import { notify } from "@/lib/notify";
 import { validateApplication, STATUS_LABELS, type ApplicationStatus } from "@/lib/application-meta";
+import { parseHoursPerWeek } from "@/lib/profile";
 import { getApplicationAllowance, getMyApplication } from "@/lib/queries/applications";
 import { upgradeConversationToChat } from "@/lib/queries/messaging";
 
@@ -23,6 +24,7 @@ export async function submitApplication(formData: FormData) {
   const input = {
     motivation: String(formData.get("motivation") ?? "").trim(),
     suitability: String(formData.get("suitability") ?? "").trim(),
+    hoursPerWeek: parseHoursPerWeek(formData.get("hoursPerWeek")),
     skillsSummary: String(formData.get("skillsSummary") ?? "").trim(),
   };
 
@@ -68,6 +70,7 @@ export async function submitApplication(formData: FormData) {
       applicantId: user.id,
       motivation: input.motivation,
       suitability: input.suitability,
+      hoursPerWeek: input.hoursPerWeek,
       skillsSummary: input.skillsSummary || null,
     });
   } catch {

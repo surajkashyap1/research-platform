@@ -2,16 +2,16 @@ import type { Metadata } from "next";
 import { Prose } from "@/components/prose";
 
 export const metadata: Metadata = {
-  title: "About — Incipit",
+  title: "About — Bylined",
   description:
-    "Why Incipit exists: making research opportunities accessible to all UK students and healthcare workers, not only the well-connected.",
+    "Why Bylined exists: making research opportunities accessible to all UK students and healthcare workers, not only the well-connected.",
 };
 
 export default function AboutPage() {
   return (
     <Prose
-      title="About Incipit"
-      intro="The easiest way to get your first publication."
+      title="About Bylined"
+      intro="Bringing research opportunities closer to students and healthcare professionals."
     >
       <p>
         Publications, audits and poster presentations are nowadays essential when
