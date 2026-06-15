@@ -25,6 +25,12 @@ export async function SiteHeader() {
           {user ? (
             <>
               <Link
+                href="/applications"
+                className={buttonVariants({ variant: "ghost", size: "sm" })}
+              >
+                Applications
+              </Link>
+              <Link
                 href="/dashboard"
                 className={buttonVariants({ variant: "ghost", size: "sm" })}
               >
