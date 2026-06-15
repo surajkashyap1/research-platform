@@ -6,11 +6,9 @@ import { submitReview } from "@/app/reviews/actions";
 import { dimensionsFor, directionLabel, RATING_MAX, RATING_MIN } from "@/lib/review-meta";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-const selectClass =
-  "flex h-9 w-28 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
 export default async function ReviewPage({
   params,
@@ -62,16 +60,17 @@ export default async function ReviewPage({
                   <Label htmlFor={d.key}>{d.label}</Label>
                   <p className="text-xs text-muted-foreground">{d.hint}</p>
                 </div>
-                <select id={d.key} name={d.key} required defaultValue="" className={selectClass}>
-                  <option value="" disabled>
-                    Rate…
-                  </option>
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <option key={n} value={n}>
-                      {n}
-                    </option>
-                  ))}
-                </select>
+                <Select
+                  id={d.key}
+                  name={d.key}
+                  required
+                  placeholder="Rate…"
+                  className="w-28"
+                  options={[1, 2, 3, 4, 5].map((n) => ({
+                    value: String(n),
+                    label: String(n),
+                  }))}
+                />
               </div>
             ))}
 

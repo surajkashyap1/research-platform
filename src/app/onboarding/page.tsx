@@ -4,6 +4,7 @@ import { CAREER_STAGES } from "@/lib/profile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
@@ -12,9 +13,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-const selectClass =
-  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
 export default async function OnboardingPage() {
   const user = await requireUser();
@@ -43,18 +41,12 @@ export default async function OnboardingPage() {
 
             <div className="grid gap-2">
               <Label htmlFor="careerStage">Career stage</Label>
-              <select
+              <Select
                 id="careerStage"
                 name="careerStage"
                 defaultValue={profile.careerStage}
-                className={selectClass}
-              >
-                {CAREER_STAGES.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
+                options={CAREER_STAGES}
+              />
             </div>
 
             <div className="grid gap-2">

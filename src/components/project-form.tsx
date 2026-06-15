@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
   PROJECT_TYPES,
@@ -8,9 +9,6 @@ import {
   ROLE_CATEGORIES,
   type Project,
 } from "@/lib/project-meta";
-
-const selectClass =
-  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
 export function ProjectForm({
   action,
@@ -59,34 +57,22 @@ export function ProjectForm({
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="grid gap-2">
           <Label htmlFor="projectType">Type</Label>
-          <select
+          <Select
             id="projectType"
             name="projectType"
             defaultValue={project?.projectType ?? "audit"}
-            className={selectClass}
-          >
-            {PROJECT_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
-              </option>
-            ))}
-          </select>
+            options={PROJECT_TYPES}
+          />
         </div>
 
         <div className="grid gap-2">
           <Label htmlFor="experienceLevel">Experience level</Label>
-          <select
+          <Select
             id="experienceLevel"
             name="experienceLevel"
             defaultValue={project?.experienceLevel ?? "beginner_welcome"}
-            className={selectClass}
-          >
-            {EXPERIENCE_LEVELS.map((e) => (
-              <option key={e.value} value={e.value}>
-                {e.label}
-              </option>
-            ))}
-          </select>
+            options={EXPERIENCE_LEVELS}
+          />
         </div>
 
         <div className="grid gap-2">
@@ -101,19 +87,15 @@ export function ProjectForm({
 
         <div className="grid gap-2">
           <Label htmlFor="roleCategory">Entry-level role (optional)</Label>
-          <select
+          <Select
             id="roleCategory"
             name="roleCategory"
             defaultValue={project?.roleCategory ?? ""}
-            className={selectClass}
-          >
-            <option value="">— None —</option>
-            {ROLE_CATEGORIES.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
-          </select>
+            options={[
+              { value: "", label: "— None —" },
+              ...ROLE_CATEGORIES.map((r) => ({ value: r, label: r })),
+            ]}
+          />
         </div>
 
         <div className="grid gap-2">

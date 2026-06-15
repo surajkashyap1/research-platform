@@ -14,10 +14,8 @@ import {
   type ExperienceLevel,
 } from "@/lib/project-meta";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { Button, buttonVariants } from "@/components/ui/button";
-
-const selectClass =
-  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
 type SP = {
   q?: string;
@@ -107,27 +105,18 @@ export default async function ProjectsPage({
         <input type="hidden" name="tab" value={tab} />
         <Input name="q" placeholder="Search title or description" defaultValue={q ?? ""} />
         <Input name="specialty" placeholder="Specialty" defaultValue={specialty ?? ""} />
-        <select name="type" defaultValue={type ?? ""} className={selectClass}>
-          <option value="">Any type</option>
-          {PROJECT_TYPES.map((t) => (
-            <option key={t.value} value={t.value}>
-              {t.label}
-            </option>
-          ))}
-        </select>
+        <Select
+          name="type"
+          defaultValue={type ?? ""}
+          options={[{ value: "", label: "Any type" }, ...PROJECT_TYPES]}
+        />
         <div className="flex gap-2">
-          <select
+          <Select
             name="experience"
             defaultValue={experience ?? ""}
-            className={selectClass}
-          >
-            <option value="">Any level</option>
-            {EXPERIENCE_LEVELS.map((e) => (
-              <option key={e.value} value={e.value}>
-                {e.label}
-              </option>
-            ))}
-          </select>
+            className="flex-1"
+            options={[{ value: "", label: "Any level" }, ...EXPERIENCE_LEVELS]}
+          />
           <Button type="submit" variant="outline">
             Filter
           </Button>
