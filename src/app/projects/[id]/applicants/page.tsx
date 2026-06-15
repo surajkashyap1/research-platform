@@ -8,7 +8,7 @@ import { openConversation } from "@/app/messages/actions";
 import { STATUS_LABELS, STATUS_BADGE_CLASS } from "@/lib/application-meta";
 import { CAREER_STAGES } from "@/lib/profile";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 const STATUS_ORDER = { shortlisted: 0, pending: 1, accepted: 2, rejected: 3, withdrawn: 4 };
@@ -60,7 +60,12 @@ export default async function ApplicantsPage({
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="font-medium">
-                        {a.applicantName ?? "Member"}
+                        <Link
+                          href={`/profile/${a.applicantId}`}
+                          className="hover:underline"
+                        >
+                          {a.applicantName ?? "Member"}
+                        </Link>
                         {a.applicantVerified && (
                           <span className="ml-1 text-success" title="Verified">
                             ✓
@@ -127,6 +132,14 @@ export default async function ApplicantsPage({
                           Message
                         </Button>
                       </form>
+                      {a.status === "accepted" && (
+                        <Link
+                          href={`/projects/${id}/review/${a.applicantId}`}
+                          className={buttonVariants({ variant: "outline", size: "sm" })}
+                        >
+                          Review
+                        </Link>
+                      )}
                     </div>
                   )}
                 </CardContent>

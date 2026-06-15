@@ -29,9 +29,17 @@ export default async function DashboardPage() {
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">{profile.email}</p>
         </div>
-        <Link href="/onboarding" className={buttonVariants({ variant: "outline", size: "sm" })}>
-          Edit profile
-        </Link>
+        <div className="flex shrink-0 gap-2">
+          <Link
+            href={`/profile/${user.id}`}
+            className={buttonVariants({ variant: "ghost", size: "sm" })}
+          >
+            Public profile
+          </Link>
+          <Link href="/onboarding" className={buttonVariants({ variant: "outline", size: "sm" })}>
+            Edit profile
+          </Link>
+        </div>
       </div>
 
       {/* Verification + status badges */}

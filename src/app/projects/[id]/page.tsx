@@ -7,7 +7,7 @@ import {
   getMyApplication,
 } from "@/lib/queries/applications";
 import { getQuestionsForProject } from "@/lib/queries/questions";
-import { closeProject, reopenProject } from "@/app/projects/actions";
+import { closeProject, reopenProject, completeProject } from "@/app/projects/actions";
 import { openConversation } from "@/app/messages/actions";
 import { projectTypeLabel, experienceLabel } from "@/lib/project-meta";
 import { STATUS_LABELS, STATUS_BADGE_CLASS } from "@/lib/application-meta";
@@ -108,7 +108,9 @@ export default async function ProjectDetailPage({
           <div>
             <p className="text-muted-foreground">Posted by</p>
             <p className="mt-0.5 font-semibold">
-              {project.ownerName ?? "Unknown"}
+              <Link href={`/profile/${project.ownerId}`} className="hover:underline">
+                {project.ownerName ?? "Unknown"}
+              </Link>
               {project.ownerVerified && (
                 <span className="ml-1 text-success" title="Verified">
                   ✓
@@ -149,6 +151,14 @@ export default async function ProjectDetailPage({
               </Button>
             </form>
           )}
+          {project.status !== "completed" && (
+            <form action={completeProject}>
+              <input type="hidden" name="id" value={project.id} />
+              <Button type="submit" variant="outline">
+                Mark completed
+              </Button>
+            </form>
+          )}
         </div>
       ) : (
         /* Applicant flow */
@@ -173,13 +183,23 @@ export default async function ProjectDetailPage({
                 </Link>
                 .
               </p>
-              <form action={openConversation} className="mt-4">
-                <input type="hidden" name="projectId" value={project.id} />
-                <input type="hidden" name="otherId" value={project.ownerId} />
-                <Button type="submit" variant="outline" size="sm">
-                  Message the lister
-                </Button>
-              </form>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <form action={openConversation}>
+                  <input type="hidden" name="projectId" value={project.id} />
+                  <input type="hidden" name="otherId" value={project.ownerId} />
+                  <Button type="submit" variant="outline" size="sm">
+                    Message the lister
+                  </Button>
+                </form>
+                {myApplication.status === "accepted" && (
+                  <Link
+                    href={`/projects/${project.id}/review/${project.ownerId}`}
+                    className={buttonVariants({ variant: "outline", size: "sm" })}
+                  >
+                    Review supervisor
+                  </Link>
+                )}
+              </div>
             </div>
           ) : project.status !== "open" ? (
             <Button disabled>Listing closed</Button>

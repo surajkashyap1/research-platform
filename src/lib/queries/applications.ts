@@ -104,6 +104,7 @@ export type MyApplicationItem = {
   projectTitle: string;
   projectStatus: string;
   projectTypeLabel: string;
+  projectOwnerId: string;
 };
 
 // Applicant dashboard: the current user's applications with project context.
@@ -120,6 +121,7 @@ export async function getApplicationsByApplicant(
       projectTitle: projects.title,
       projectStatus: projects.status,
       projectType: projects.projectType,
+      projectOwnerId: projects.ownerId,
     })
     .from(applications)
     .innerJoin(projects, eq(projects.id, applications.projectId))
@@ -135,6 +137,7 @@ export async function getApplicationsByApplicant(
     projectTitle: r.projectTitle,
     projectStatus: r.projectStatus,
     projectTypeLabel: projectTypeLabel(r.projectType),
+    projectOwnerId: r.projectOwnerId,
   }));
 }
 

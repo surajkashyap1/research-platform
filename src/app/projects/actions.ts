@@ -6,6 +6,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { projects } from "@/db/schema";
 import { requireUser, requireSupervisor } from "@/lib/auth";
+import { awardBadge } from "@/lib/badges";
 import {
   PROJECT_TYPE_VALUES,
   EXPERIENCE_VALUES,
@@ -90,6 +91,26 @@ export async function closeProject(formData: FormData) {
     .update(projects)
     .set({ status: "closed", updatedAt: new Date() })
     .where(and(eq(projects.id, id), eq(projects.ownerId, user.id)));
+
+  revalidatePath(`/projects/${id}`);
+  revalidatePath("/projects");
+  redirect(`/projects/${id}`);
+}
+
+export async function completeProject(formData: FormData) {
+  const user = await requireUser();
+  const id = String(formData.get("id") ?? "");
+
+  // Owner guard via where clause; only award if a row was actually updated.
+  const updated = await db
+    .update(projects)
+    .set({ status: "completed", updatedAt: new Date() })
+    .where(and(eq(projects.id, id), eq(projects.ownerId, user.id)))
+    .returning({ id: projects.id });
+  if (!updated.length) redirect(`/projects/${id}`);
+
+  // Leading a project to completion earns the Project Lead badge (ROADMAP §5).
+  await awardBadge(user.id, "project_lead");
 
   revalidatePath(`/projects/${id}`);
   revalidatePath("/projects");

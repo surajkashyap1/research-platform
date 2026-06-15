@@ -78,6 +78,14 @@ export default async function ApplicationsPage() {
                     </Button>
                   </form>
                 )}
+                {a.status === "accepted" && (
+                  <Link
+                    href={`/projects/${a.projectId}/review/${a.projectOwnerId}`}
+                    className={buttonVariants({ variant: "outline", size: "sm" })}
+                  >
+                    Review supervisor
+                  </Link>
+                )}
               </div>
             </li>
           ))}
