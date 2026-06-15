@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { SubmitButton } from "@/components/submit-button";
 import { Textarea } from "@/components/ui/textarea";
 import {
   PROJECT_TYPES,
@@ -130,9 +130,9 @@ export function ProjectForm({
         Mark as beginner-friendly (gets higher visibility)
       </label>
 
-      <Button type="submit" className="self-start">
+      <SubmitButton className="self-start" pendingLabel="Saving...">
         {submitLabel}
-      </Button>
+      </SubmitButton>
     </form>
   );
 }
