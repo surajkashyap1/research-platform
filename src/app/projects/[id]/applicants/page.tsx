@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { getProjectRow } from "@/lib/queries/projects";
 import { getApplicantsForProject } from "@/lib/queries/applications";
 import { setApplicationStatus } from "@/app/applications/actions";
+import { openConversation } from "@/app/messages/actions";
 import { STATUS_LABELS, STATUS_BADGE_CLASS } from "@/lib/application-meta";
 import { CAREER_STAGES } from "@/lib/profile";
 import { Badge } from "@/components/ui/badge";
@@ -119,6 +120,13 @@ export default async function ApplicantsPage({
                       {a.status !== "rejected" && (
                         <StatusButton id={a.id} projectId={id} status="rejected" label="Reject" variant="ghost" />
                       )}
+                      <form action={openConversation}>
+                        <input type="hidden" name="projectId" value={id} />
+                        <input type="hidden" name="otherId" value={a.applicantId} />
+                        <Button type="submit" size="sm" variant="ghost">
+                          Message
+                        </Button>
+                      </form>
                     </div>
                   )}
                 </CardContent>

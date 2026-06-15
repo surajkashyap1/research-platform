@@ -8,6 +8,7 @@ import {
 } from "@/lib/queries/applications";
 import { getQuestionsForProject } from "@/lib/queries/questions";
 import { closeProject, reopenProject } from "@/app/projects/actions";
+import { openConversation } from "@/app/messages/actions";
 import { projectTypeLabel, experienceLabel } from "@/lib/project-meta";
 import { STATUS_LABELS, STATUS_BADGE_CLASS } from "@/lib/application-meta";
 import { ApplicationForm } from "@/components/application-form";
@@ -172,6 +173,13 @@ export default async function ProjectDetailPage({
                 </Link>
                 .
               </p>
+              <form action={openConversation} className="mt-4">
+                <input type="hidden" name="projectId" value={project.id} />
+                <input type="hidden" name="otherId" value={project.ownerId} />
+                <Button type="submit" variant="outline" size="sm">
+                  Message the lister
+                </Button>
+              </form>
             </div>
           ) : project.status !== "open" ? (
             <Button disabled>Listing closed</Button>

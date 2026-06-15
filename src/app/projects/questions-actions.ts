@@ -6,6 +6,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { listingQuestions, projects } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
+import { notify } from "@/lib/notify";
 
 const MAX_QUESTION_CHARS = 500;
 const MAX_ANSWER_CHARS = 1000;
@@ -26,7 +27,7 @@ export async function askQuestion(formData: FormData) {
     backTo(projectId, `Keep questions under ${MAX_QUESTION_CHARS} characters.`);
 
   const [project] = await db
-    .select({ id: projects.id, status: projects.status })
+    .select({ id: projects.id, status: projects.status, ownerId: projects.ownerId, title: projects.title })
     .from(projects)
     .where(eq(projects.id, projectId))
     .limit(1);
@@ -38,6 +39,15 @@ export async function askQuestion(formData: FormData) {
     projectId,
     askerId: user.id,
     question,
+  });
+
+  await notify({
+    profileId: project.ownerId,
+    actorId: user.id,
+    type: "system",
+    title: "New question on your listing",
+    body: `Someone asked about “${project.title}”.`,
+    link: `/projects/${projectId}#qa`,
   });
 
   revalidatePath(`/projects/${projectId}`);
@@ -56,11 +66,17 @@ export async function answerQuestion(formData: FormData) {
 
   // Confirm ownership of the project this question belongs to.
   const [owned] = await db
-    .select({ id: projects.id })
+    .select({ id: projects.id, title: projects.title })
     .from(projects)
     .where(and(eq(projects.id, projectId), eq(projects.ownerId, user.id)))
     .limit(1);
   if (!owned) redirect(`/projects/${projectId}`);
+
+  const [q] = await db
+    .select({ askerId: listingQuestions.askerId })
+    .from(listingQuestions)
+    .where(and(eq(listingQuestions.id, id), eq(listingQuestions.projectId, projectId)))
+    .limit(1);
 
   await db
     .update(listingQuestions)
@@ -68,6 +84,17 @@ export async function answerQuestion(formData: FormData) {
     .where(
       and(eq(listingQuestions.id, id), eq(listingQuestions.projectId, projectId))
     );
+
+  if (q) {
+    await notify({
+      profileId: q.askerId,
+      actorId: user.id,
+      type: "system",
+      title: "Your question was answered",
+      body: `The lister replied about “${owned.title}”.`,
+      link: `/projects/${projectId}#qa`,
+    });
+  }
 
   revalidatePath(`/projects/${projectId}`);
   backTo(projectId);

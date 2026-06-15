@@ -6,8 +6,10 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { applications, projects } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
-import { validateApplication, type ApplicationStatus } from "@/lib/application-meta";
+import { notify } from "@/lib/notify";
+import { validateApplication, STATUS_LABELS, type ApplicationStatus } from "@/lib/application-meta";
 import { getApplicationAllowance, getMyApplication } from "@/lib/queries/applications";
+import { upgradeConversationToChat } from "@/lib/queries/messaging";
 
 function redirectWith(projectId: string, error: string): never {
   redirect(`/projects/${projectId}?error=${encodeURIComponent(error)}`);
@@ -26,7 +28,12 @@ export async function submitApplication(formData: FormData) {
 
   // The project must exist and be open, and you can't apply to your own.
   const [project] = await db
-    .select({ id: projects.id, status: projects.status, ownerId: projects.ownerId })
+    .select({
+      id: projects.id,
+      status: projects.status,
+      ownerId: projects.ownerId,
+      title: projects.title,
+    })
     .from(projects)
     .where(eq(projects.id, projectId))
     .limit(1);
@@ -68,6 +75,15 @@ export async function submitApplication(formData: FormData) {
     redirectWith(projectId, "You've already applied to this project.");
   }
 
+  await notify({
+    profileId: project.ownerId,
+    actorId: user.id,
+    type: "application",
+    title: "New application",
+    body: `Someone applied to “${project.title}”.`,
+    link: `/projects/${projectId}/applicants`,
+  });
+
   revalidatePath(`/projects/${projectId}`);
   revalidatePath("/applications");
   redirect(`/projects/${projectId}?applied=1`);
@@ -101,16 +117,37 @@ export async function setApplicationStatus(formData: FormData) {
 
   // Confirm the current user owns the project this application belongs to.
   const [owned] = await db
-    .select({ id: projects.id })
+    .select({ id: projects.id, title: projects.title })
     .from(projects)
     .where(and(eq(projects.id, projectId), eq(projects.ownerId, user.id)))
     .limit(1);
   if (!owned) redirect("/dashboard");
 
+  const [app] = await db
+    .select({ applicantId: applications.applicantId })
+    .from(applications)
+    .where(and(eq(applications.id, id), eq(applications.projectId, projectId)))
+    .limit(1);
+  if (!app) redirect(`/projects/${projectId}/applicants`);
+
   await db
     .update(applications)
     .set({ status })
     .where(and(eq(applications.id, id), eq(applications.projectId, projectId)));
+
+  // Shortlisting/accepting unlocks unlimited project chat (plan §7).
+  if (status === "shortlisted" || status === "accepted") {
+    await upgradeConversationToChat(projectId, app.applicantId, user.id);
+  }
+
+  await notify({
+    profileId: app.applicantId,
+    actorId: user.id,
+    type: "application",
+    title: `Application ${STATUS_LABELS[status].toLowerCase()}`,
+    body: `Your application to “${owned.title}” was ${STATUS_LABELS[status].toLowerCase()}.`,
+    link: "/applications",
+  });
 
   revalidatePath(`/projects/${projectId}/applicants`);
   redirect(`/projects/${projectId}/applicants`);
