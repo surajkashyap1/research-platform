@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Hanken_Grotesk, Newsreader } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+import { CookieBanner } from "@/components/cookie-banner";
 
 // Humanist sans carries all UI: body, buttons, labels, data.
 const sans = Hanken_Grotesk({
@@ -37,6 +39,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background">
         <SiteHeader />
         {children}
+        <SiteFooter />
+        <CookieBanner />
       </body>
     </html>
   );
