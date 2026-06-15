@@ -1,13 +1,15 @@
-import { and, count, desc, eq, gte } from "drizzle-orm";
+import { and, count, desc, eq, gte, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { applications, projects, profiles } from "@/db/schema";
+import { applications, projects, profiles, reviews } from "@/db/schema";
 import {
   APPLICATION_WINDOW_DAYS,
   BASE_APPLICATION_LIMIT,
   BONUS_APPLICATION_LIMIT,
+  countWords,
   type ApplicationStatus,
 } from "@/lib/application-meta";
 import { projectTypeLabel } from "@/lib/project-meta";
+import { scoreApplicant, type RankingResult } from "@/lib/ranking";
 
 function windowStart(days: number): Date {
   return new Date(Date.now() - days * 24 * 60 * 60 * 1000);
@@ -156,12 +158,28 @@ export type ApplicantItem = {
   applicantNewResearcher: boolean;
 };
 
-// Lister view: everyone who applied to a project the current user owns.
-// Shortlisted first, then pending, then decided — newest within each.
-export async function getApplicantsForProject(
-  projectId: string
-): Promise<ApplicantItem[]> {
-  return db
+export type ProjectRankMeta = {
+  isBeginnerFriendly: boolean;
+  specialty: string | null;
+  roleCategory: string | null;
+};
+
+export type RankedApplicant = ApplicantItem & { ranking: RankingResult };
+
+// Lister view with fair ranking (ROADMAP §6). Pulls the extra applicant signals
+// the scorer needs, computes a transparent score, and orders undecided
+// applicants by it (shortlisted first, decided/withdrawn last).
+export async function getRankedApplicantsForProject(
+  projectId: string,
+  project: ProjectRankMeta
+): Promise<RankedApplicant[]> {
+  const reviewCount = sql<number>`(
+    select count(*)::int from ${reviews} rv
+    where rv.reviewee_id = ${profiles.id}
+      and rv.direction = 'supervisor_to_member'
+  )`;
+
+  const rows = await db
     .select({
       id: applications.id,
       status: applications.status,
@@ -175,9 +193,59 @@ export async function getApplicantsForProject(
       applicantCareerStage: profiles.careerStage,
       applicantVerified: profiles.isVerified,
       applicantNewResearcher: profiles.isNewResearcher,
+      reliabilityScore: profiles.reliabilityScore,
+      profileCompleteness: profiles.profileCompleteness,
+      availability: profiles.availability,
+      applicantSpecialty: profiles.specialty,
+      reviewCount,
     })
     .from(applications)
     .innerJoin(profiles, eq(profiles.id, applications.applicantId))
     .where(eq(applications.projectId, projectId))
     .orderBy(desc(applications.createdAt));
+
+  const statusRank: Record<ApplicationStatus, number> = {
+    shortlisted: 0,
+    pending: 1,
+    accepted: 2,
+    rejected: 3,
+    withdrawn: 4,
+  };
+
+  return rows
+    .map((r) => {
+      const ranking = scoreApplicant({
+        reliabilityScore: r.reliabilityScore != null ? Number(r.reliabilityScore) : null,
+        reviewCount: r.reviewCount,
+        isNewResearcher: r.applicantNewResearcher,
+        profileCompleteness: r.profileCompleteness,
+        hasAvailability: !!r.availability?.trim(),
+        applicantSpecialty: r.applicantSpecialty,
+        skillsSummary: r.skillsSummary,
+        motivationWords: countWords(`${r.motivation} ${r.suitability}`),
+        beginnerFriendly: project.isBeginnerFriendly,
+        projectSpecialty: project.specialty,
+        roleCategory: project.roleCategory,
+      });
+      return {
+        id: r.id,
+        status: r.status,
+        createdAt: r.createdAt,
+        motivation: r.motivation,
+        suitability: r.suitability,
+        skillsSummary: r.skillsSummary,
+        applicantId: r.applicantId,
+        applicantName: r.applicantName,
+        applicantUniversity: r.applicantUniversity,
+        applicantCareerStage: r.applicantCareerStage,
+        applicantVerified: r.applicantVerified,
+        applicantNewResearcher: r.applicantNewResearcher,
+        ranking,
+      };
+    })
+    .sort(
+      (a, b) =>
+        statusRank[a.status] - statusRank[b.status] ||
+        b.ranking.score - a.ranking.score
+    );
 }

@@ -20,11 +20,11 @@ export async function SiteHeader() {
       <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-6">
         <Link
           href="/"
-          className="font-heading text-xl font-semibold tracking-tight text-foreground transition-opacity hover:opacity-70"
+          className="shrink-0 font-heading text-xl font-semibold tracking-tight text-foreground transition-opacity hover:opacity-70"
         >
           Incipit
         </Link>
-        <nav className="flex items-center gap-1.5">
+        <nav className="flex items-center gap-1.5 overflow-x-auto [&>*]:shrink-0">
           <Link
             href="/projects"
             className={buttonVariants({ variant: "ghost", size: "sm" })}
