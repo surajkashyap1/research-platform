@@ -54,6 +54,10 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 /* Scholarly Editorial: claret + ink on warm "paper" off-white.
    Type and whitespace lead; claret is the single restrained accent;
    teal-green --success carries verified / beginner-friendly / positive. */
