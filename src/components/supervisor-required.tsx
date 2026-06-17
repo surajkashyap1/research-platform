@@ -8,31 +8,30 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-// Shown to logged-in users who lack the can_supervise flag when they reach a
-// page that posts/edits projects. Posting is gated to verified supervisors and
-// healthcare professionals (set from a verified email — see plan §8).
+// Shown to logged-in users who aren't verified when they reach a page that
+// posts/edits projects. Posting is gated to verified accounts (a .ac.uk /
+// .nhs.uk email, confirmed at signup or via the "Get verified" flow).
 export function SupervisorRequired() {
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">
       <Card>
         <CardHeader>
-          <CardTitle>Posting is for verified supervisors</CardTitle>
+          <CardTitle>Verify your account to post</CardTitle>
           <CardDescription>
-            Projects can be posted by supervisors and healthcare professionals
-            whose account is verified from a recognised email (e.g. an NHS trust
-            or institutional address). Your account isn&apos;t verified to post
-            yet.
+            Posting a project requires a verified account. Verify with a{" "}
+            <strong>.ac.uk</strong> or <strong>.nhs.uk</strong> email — you can
+            use a different address from the one you signed up with.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
-          <Link href="/projects" className={buttonVariants()}>
-            Browse projects
+          <Link href="/onboarding#verify" className={buttonVariants()}>
+            Get verified
           </Link>
           <Link
-            href="/dashboard"
+            href="/projects"
             className={buttonVariants({ variant: "outline" })}
           >
-            Back to dashboard
+            Browse projects
           </Link>
         </CardContent>
       </Card>

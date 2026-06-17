@@ -1,7 +1,9 @@
-import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { getNotifications } from "@/lib/queries/notifications";
-import { markAllNotificationsRead } from "@/app/notifications/actions";
+import {
+  markAllNotificationsRead,
+  markNotificationRead,
+} from "@/app/notifications/actions";
 import { Button } from "@/components/ui/button";
 
 export default async function NotificationsPage() {
@@ -59,13 +61,18 @@ export default async function NotificationsPage() {
             );
             return (
               <li key={n.id}>
-                {n.link ? (
-                  <Link href={n.link} className="block hover:bg-muted/50">
+                <form action={markNotificationRead}>
+                  <input type="hidden" name="id" value={n.id} />
+                  {n.link && (
+                    <input type="hidden" name="link" value={n.link} />
+                  )}
+                  <button
+                    type="submit"
+                    className="block w-full text-left hover:bg-muted/50"
+                  >
                     {inner}
-                  </Link>
-                ) : (
-                  inner
-                )}
+                  </button>
+                </form>
               </li>
             );
           })}

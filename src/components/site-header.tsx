@@ -1,19 +1,15 @@
 import Link from "next/link";
 import { getSessionUser } from "@/lib/auth";
 import { signOut } from "@/app/auth/actions";
-import { getUnreadMessageCount } from "@/lib/queries/messaging";
 import { getUnreadNotificationCount } from "@/lib/queries/notifications";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 
 export async function SiteHeader() {
   const user = await getSessionUser();
-  const [unreadMessages, unreadNotifications] = user
-    ? await Promise.all([
-        getUnreadMessageCount(user.id),
-        getUnreadNotificationCount(user.id),
-      ])
-    : [0, 0];
+  const unreadNotifications = user
+    ? await getUnreadNotificationCount(user.id)
+    : 0;
 
   return (
     <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
@@ -38,17 +34,6 @@ export async function SiteHeader() {
                 className={buttonVariants({ variant: "ghost", size: "sm" })}
               >
                 Applications
-              </Link>
-              <Link
-                href="/messages"
-                className={`relative ${buttonVariants({ variant: "ghost", size: "sm" })}`}
-              >
-                Messages
-                {unreadMessages > 0 && (
-                  <Badge className="ml-1.5 border-transparent bg-primary px-1.5 text-primary-foreground">
-                    {unreadMessages}
-                  </Badge>
-                )}
               </Link>
               <Link
                 href="/notifications"

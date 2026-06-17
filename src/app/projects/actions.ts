@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { projects } from "@/db/schema";
-import { requireUser, requireSupervisor } from "@/lib/auth";
+import { requireUser, requirePoster } from "@/lib/auth";
 import { awardBadge } from "@/lib/badges";
 import {
   PROJECT_TYPE_VALUES,
@@ -47,8 +47,9 @@ function parseProjectForm(formData: FormData) {
 }
 
 export async function createProject(formData: FormData) {
-  const { user } = await requireSupervisor();
+  const { user } = await requirePoster();
   const data = parseProjectForm(formData);
+  const isSupervisor = formData.get("isSupervisor") === "on";
 
   if (!data.title || !data.description) {
     redirect("/projects/new?error=Title+and+description+are+required");
@@ -56,7 +57,12 @@ export async function createProject(formData: FormData) {
 
   const [created] = await db
     .insert(projects)
-    .values({ ownerId: user.id, status: "open", ...data })
+    .values({
+      ownerId: user.id,
+      status: "open",
+      supervisorId: isSupervisor ? user.id : null,
+      ...data,
+    })
     .returning({ id: projects.id });
 
   revalidatePath("/projects");
@@ -64,9 +70,10 @@ export async function createProject(formData: FormData) {
 }
 
 export async function updateProject(formData: FormData) {
-  const { user } = await requireSupervisor();
+  const { user } = await requirePoster();
   const id = String(formData.get("id") ?? "");
   const data = parseProjectForm(formData);
+  const isSupervisor = formData.get("isSupervisor") === "on";
 
   if (!id || !data.title || !data.description) {
     redirect(`/projects/${id}/edit?error=Title+and+description+are+required`);
@@ -75,7 +82,11 @@ export async function updateProject(formData: FormData) {
   // Owner guard: the where clause only matches if this user owns the project.
   await db
     .update(projects)
-    .set({ ...data, updatedAt: new Date() })
+    .set({
+      ...data,
+      supervisorId: isSupervisor ? user.id : null,
+      updatedAt: new Date(),
+    })
     .where(and(eq(projects.id, id), eq(projects.ownerId, user.id)));
 
   revalidatePath(`/projects/${id}`);

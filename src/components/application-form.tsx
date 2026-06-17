@@ -75,7 +75,7 @@ export function ApplicationForm({
       </div>
 
       <div className="grid gap-2">
-        <Label htmlFor="hoursPerWeek">How much time can you dedicate per week?</Label>
+        <Label htmlFor="hoursPerWeek">How many hours can you dedicate to the role per week?</Label>
         <Input
           id="hoursPerWeek"
           name="hoursPerWeek"

@@ -44,7 +44,9 @@ export default async function PublicProfilePage({
   ]);
 
   const stageLabel =
-    CAREER_STAGES.find((s) => s.value === profile.careerStage)?.label ?? "—";
+    profile.careerStage === "other" && profile.careerStageOther
+      ? profile.careerStageOther
+      : CAREER_STAGES.find((s) => s.value === profile.careerStage)?.label ?? "—";
   const isSelf = viewer?.id === id;
 
   return (
@@ -90,6 +92,17 @@ export default async function PublicProfilePage({
 
       {profile.summary && (
         <p className="mt-4 text-sm leading-relaxed">{profile.summary}</p>
+      )}
+
+      {profile.linkedinUrl && (
+        <a
+          href={profile.linkedinUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-3 inline-block text-sm text-primary hover:underline"
+        >
+          LinkedIn profile ↗
+        </a>
       )}
 
       <section className="mt-8 grid gap-4 sm:grid-cols-2">

@@ -3,6 +3,17 @@ import type { profiles } from "@/db/schema";
 
 export type Profile = InferSelectModel<typeof profiles>;
 
+// Word limits for free-text profile fields (kept in sync with the client
+// counters in WordLimitedField). Enforced server-side in updateProfile.
+export const SPECIALTY_WORD_LIMIT = 20;
+export const SUMMARY_WORD_LIMIT = 50;
+
+export function countWords(text: string): number {
+  const t = text.trim();
+  if (!t) return 0;
+  return t.split(/\s+/).length;
+}
+
 // Profile completeness (0–100) — drives the onboarding nudge (ROADMAP §1).
 const COMPLETENESS_FIELDS: (keyof Profile)[] = [
   "fullName",
@@ -63,13 +74,15 @@ export const CAREER_STAGES: { value: Profile["careerStage"]; label: string }[] =
   { value: "medical_student", label: "Medical student" },
   { value: "dental_student", label: "Dental student" },
   { value: "nursing_student", label: "Nursing student" },
+  { value: "masters_student", label: "Master's student" },
+  { value: "phd_student", label: "PhD student" },
   { value: "other_student", label: "Other student" },
   { value: "foundation_doctor", label: "Foundation doctor" },
   { value: "junior_doctor", label: "Junior doctor" },
   { value: "registrar", label: "Registrar" },
   { value: "consultant", label: "Consultant" },
   { value: "dentist", label: "Dentist" },
-  { value: "qualified_nurse", label: "Qualified nurse" },
+  { value: "qualified_nurse", label: "Nurse" },
   { value: "professor", label: "Professor" },
   { value: "postdoc", label: "Postdoctoral researcher" },
   { value: "staff_grade", label: "Staff grade" },

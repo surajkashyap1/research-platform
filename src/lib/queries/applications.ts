@@ -39,21 +39,24 @@ export async function getApplicationAllowance(
 ): Promise<ApplicationAllowance> {
   const since = windowStart(APPLICATION_WINDOW_DAYS);
 
-  const [{ value: used }] = await db
-    .select({ value: count() })
-    .from(applications)
-    .where(
-      and(
-        eq(applications.applicantId, applicantId),
-        gte(applications.createdAt, since)
-      )
-    );
-
-  // Bonus eligibility: the user has posted at least one project (plan §8).
-  const [{ value: posted }] = await db
-    .select({ value: count() })
-    .from(projects)
-    .where(eq(projects.ownerId, applicantId));
+  // These two counts are independent — run them in one round trip's worth of
+  // wall time instead of two sequential ones.
+  const [[{ value: used }], [{ value: posted }]] = await Promise.all([
+    db
+      .select({ value: count() })
+      .from(applications)
+      .where(
+        and(
+          eq(applications.applicantId, applicantId),
+          gte(applications.createdAt, since)
+        )
+      ),
+    // Bonus eligibility: the user has posted at least one project (plan §8).
+    db
+      .select({ value: count() })
+      .from(projects)
+      .where(eq(projects.ownerId, applicantId)),
+  ]);
 
   const bonus = posted > 0;
   const limit =

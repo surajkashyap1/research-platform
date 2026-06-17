@@ -19,7 +19,7 @@ export default async function NewProjectPage({
   const profile = await ensureProfile(user);
   const { error } = await searchParams;
 
-  if (!profile.canSupervise) return <SupervisorRequired />;
+  if (!profile.isVerified) return <SupervisorRequired />;
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">

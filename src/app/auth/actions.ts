@@ -10,10 +10,13 @@ import { createClient } from "@/lib/supabase/server";
 import { ensureProfile, requireUser } from "@/lib/auth";
 import {
   computeCompleteness,
+  countWords,
   CAREER_STAGES,
   parseHoursPerWeek,
   parseListText,
   parseSkillNames,
+  SPECIALTY_WORD_LIMIT,
+  SUMMARY_WORD_LIMIT,
   type Profile,
 } from "@/lib/profile";
 import { getOptionalFile, uploadProfileAsset } from "@/lib/storage";
@@ -97,10 +100,35 @@ const VALID_STAGES = new Set(CAREER_STAGES.map((s) => s.value));
 export async function updateProfile(formData: FormData) {
   const user = await requireUser();
 
+  // Enforce the word limits the form shows, before any file upload work.
+  const specialtyRaw = String(formData.get("specialty") ?? "").trim();
+  const summaryRaw = String(formData.get("summary") ?? "").trim();
+  if (countWords(specialtyRaw) > SPECIALTY_WORD_LIMIT)
+    redirect(
+      `/onboarding?error=${encodeURIComponent(
+        `Specialty must be ${SPECIALTY_WORD_LIMIT} words or fewer.`
+      )}`
+    );
+  if (countWords(summaryRaw) > SUMMARY_WORD_LIMIT)
+    redirect(
+      `/onboarding?error=${encodeURIComponent(
+        `About you must be ${SUMMARY_WORD_LIMIT} words or fewer.`
+      )}`
+    );
+
   const stageRaw = String(formData.get("careerStage") ?? "other");
   const careerStage = (
     VALID_STAGES.has(stageRaw as Profile["careerStage"]) ? stageRaw : "other"
   ) as Profile["careerStage"];
+  const careerStageOther =
+    careerStage === "other"
+      ? String(formData.get("careerStageOther") ?? "").trim() || null
+      : null;
+
+  let linkedinUrl = String(formData.get("linkedinUrl") ?? "").trim() || null;
+  if (linkedinUrl && !/^https?:\/\//i.test(linkedinUrl)) {
+    linkedinUrl = `https://${linkedinUrl}`;
+  }
 
   const avatarFile = getOptionalFile(formData, "avatar");
   let avatarUrl = String(formData.get("existingAvatarUrl") ?? "").trim() || null;
@@ -123,8 +151,8 @@ export async function updateProfile(formData: FormData) {
   const fields = {
     fullName: String(formData.get("fullName") ?? "").trim(),
     university: String(formData.get("university") ?? "").trim() || null,
-    specialty: String(formData.get("specialty") ?? "").trim() || null,
-    summary: String(formData.get("summary") ?? "").trim() || null,
+    specialty: specialtyRaw || null,
+    summary: summaryRaw || null,
     availability: null,
     availabilityHoursPerWeek: parseHoursPerWeek(
       formData.get("availabilityHoursPerWeek")
@@ -133,6 +161,8 @@ export async function updateProfile(formData: FormData) {
     preferredProjectTypes: parseListText(formData.get("preferredProjectTypes")),
     preferredSpecialties: parseListText(formData.get("preferredSpecialties")),
     careerStage,
+    careerStageOther,
+    linkedinUrl,
   };
 
   const completeness = computeCompleteness(fields as Partial<Profile>);

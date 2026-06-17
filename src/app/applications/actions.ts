@@ -10,7 +10,6 @@ import { notify } from "@/lib/notify";
 import { validateApplication, STATUS_LABELS, type ApplicationStatus } from "@/lib/application-meta";
 import { parseHoursPerWeek } from "@/lib/profile";
 import { getApplicationAllowance, getMyApplication } from "@/lib/queries/applications";
-import { upgradeConversationToChat } from "@/lib/queries/messaging";
 
 function redirectWith(projectId: string, error: string): never {
   redirect(`/projects/${projectId}?error=${encodeURIComponent(error)}`);
@@ -137,11 +136,6 @@ export async function setApplicationStatus(formData: FormData) {
     .update(applications)
     .set({ status })
     .where(and(eq(applications.id, id), eq(applications.projectId, projectId)));
-
-  // Shortlisting/accepting unlocks unlimited project chat (plan §7).
-  if (status === "shortlisted" || status === "accepted") {
-    await upgradeConversationToChat(projectId, app.applicantId, user.id);
-  }
 
   await notify({
     profileId: app.applicantId,

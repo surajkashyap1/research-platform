@@ -23,7 +23,6 @@ import {
 } from "@/lib/queries/applications";
 import { getQuestionsForProject } from "@/lib/queries/questions";
 import { closeProject, reopenProject, completeProject } from "@/app/projects/actions";
-import { openConversation } from "@/app/messages/actions";
 import { projectTypeLabel, experienceLabel } from "@/lib/project-meta";
 import { STATUS_LABELS, STATUS_BADGE_CLASS } from "@/lib/application-meta";
 import { CAREER_STAGES } from "@/lib/profile";
@@ -275,13 +274,6 @@ export default async function ProjectDetailPage({
                 .
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <form action={openConversation}>
-                  <input type="hidden" name="projectId" value={project.id} />
-                  <input type="hidden" name="otherId" value={project.ownerId} />
-                  <Button type="submit" variant="outline" size="sm">
-                    Message the lister
-                  </Button>
-                </form>
                 {myApplication.status === "accepted" && (
                   <Link
                     href={`/projects/${project.id}/review/${project.ownerId}`}

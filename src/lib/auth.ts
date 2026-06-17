@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import type { User } from "@supabase/supabase-js";
@@ -9,13 +10,16 @@ import type { Profile } from "@/lib/profile";
 
 // Server-only auth helpers. Never import into a client component.
 
-export async function getSessionUser(): Promise<User | null> {
+// Memoised per request (React cache): the layout header, the page, and any
+// server action in the same request reuse one getUser() call instead of each
+// making its own network round trip to the Supabase Auth server.
+export const getSessionUser = cache(async (): Promise<User | null> => {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   return user;
-}
+});
 
 export async function requireUser(): Promise<User> {
   const user = await getSessionUser();
@@ -26,7 +30,7 @@ export async function requireUser(): Promise<User> {
 // Idempotently ensure a profile row exists for an authenticated user.
 // Called after sign-in/sign-up instead of a DB trigger — pure TypeScript,
 // easy to reason about, and safe to call repeatedly.
-export async function ensureProfile(user: User): Promise<Profile> {
+export const ensureProfile = cache(async (user: User): Promise<Profile> => {
   const found = await db
     .select()
     .from(profiles)
@@ -61,18 +65,20 @@ export async function ensureProfile(user: User): Promise<Profile> {
     .where(eq(profiles.id, user.id))
     .limit(1);
   return again[0];
-}
+});
 
-// Posting projects is restricted to users with a verified supervisor email
-// (can_supervise). RLS is added before launch; this server check is the gate.
-// Returns both user and profile so callers can avoid a second lookup.
-export async function requireSupervisor(): Promise<{
+// Posting projects is restricted to verified users (a .ac.uk / .nhs.uk email,
+// confirmed at signup or via the "Get verified" flow). Being verified does not
+// imply supervisor status — that's chosen per project. RLS is added before
+// launch; this server check is the gate. Returns user + profile so callers can
+// avoid a second lookup.
+export async function requirePoster(): Promise<{
   user: User;
   profile: Profile;
 }> {
   const user = await requireUser();
   const profile = await ensureProfile(user);
-  if (!profile.canSupervise) redirect("/projects/new");
+  if (!profile.isVerified) redirect("/projects/new");
   return { user, profile };
 }
 

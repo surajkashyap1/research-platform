@@ -1,12 +1,15 @@
 import { requireUser, ensureProfile } from "@/lib/auth";
 import { updateProfile } from "@/app/auth/actions";
-import { CAREER_STAGES } from "@/lib/profile";
+import { requestVerification } from "@/app/onboarding/verify-actions";
+import { SPECIALTY_WORD_LIMIT, SUMMARY_WORD_LIMIT } from "@/lib/profile";
+import { UK_UNIVERSITIES } from "@/lib/universities";
 import { getProfileEditorData } from "@/lib/queries/profiles";
 import { Button } from "@/components/ui/button";
+import { CareerStageField } from "@/components/career-stage-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { WordLimitedField } from "@/components/word-limited-field";
 import {
   Card,
   CardContent,
@@ -18,11 +21,15 @@ import {
 export default async function OnboardingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{
+    error?: string;
+    verify?: string;
+    link?: string;
+  }>;
 }) {
   const user = await requireUser();
   await ensureProfile(user);
-  const [{ error }, editorData] = await Promise.all([
+  const [{ error, verify, link }, editorData] = await Promise.all([
     searchParams,
     getProfileEditorData(user.id),
   ]);
@@ -92,43 +99,56 @@ export default async function OnboardingPage({
               />
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="careerStage">Career stage</Label>
-              <Select
-                id="careerStage"
-                name="careerStage"
-                defaultValue={profile.careerStage}
-                options={CAREER_STAGES}
-              />
-            </div>
+            <CareerStageField
+              defaultValue={profile.careerStage}
+              defaultOther={profile.careerStageOther ?? ""}
+            />
 
             <div className="grid gap-2">
               <Label htmlFor="university">University / institution</Label>
               <Input
                 id="university"
                 name="university"
+                list="uk-universities"
+                placeholder="Start typing to search, or enter your own"
                 defaultValue={profile.university ?? ""}
               />
+              <datalist id="uk-universities">
+                {UK_UNIVERSITIES.map((u) => (
+                  <option key={u} value={u} />
+                ))}
+              </datalist>
             </div>
 
+            <WordLimitedField
+              id="specialty"
+              name="specialty"
+              label="Specialty / area of interest"
+              max={SPECIALTY_WORD_LIMIT}
+              placeholder="e.g. Cardiology, Public health"
+              defaultValue={profile.specialty ?? ""}
+            />
+
+            <WordLimitedField
+              id="summary"
+              name="summary"
+              label="About you"
+              max={SUMMARY_WORD_LIMIT}
+              multiline
+              rows={4}
+              placeholder="A short summary of your interests, skills, and what you're looking for."
+              defaultValue={profile.summary ?? ""}
+            />
+
             <div className="grid gap-2">
-              <Label htmlFor="specialty">Specialty / area of interest</Label>
+              <Label htmlFor="linkedinUrl">LinkedIn profile (optional)</Label>
               <Input
-                id="specialty"
-                name="specialty"
-                placeholder="e.g. Cardiology, Public health"
-                defaultValue={profile.specialty ?? ""}
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="summary">About you</Label>
-              <Textarea
-                id="summary"
-                name="summary"
-                rows={4}
-                placeholder="A short summary of your interests, skills, and what you're looking for."
-                defaultValue={profile.summary ?? ""}
+                id="linkedinUrl"
+                name="linkedinUrl"
+                type="url"
+                inputMode="url"
+                placeholder="https://www.linkedin.com/in/your-handle"
+                defaultValue={profile.linkedinUrl ?? ""}
               />
             </div>
 
@@ -232,6 +252,82 @@ export default async function OnboardingPage({
               Save profile
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      <Card id="verify" className="mt-6 scroll-mt-20">
+        <CardHeader>
+          <CardTitle>Get verified</CardTitle>
+          <CardDescription>
+            Verify with a <strong>.ac.uk</strong> or <strong>.nhs.uk</strong>{" "}
+            email to unlock posting projects. You can verify a different address
+            from the one you signed up with.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {profile.isVerified ? (
+            <p className="rounded-md border border-success/30 bg-success/10 px-4 py-3 text-sm text-success-foreground">
+              Your account is verified. You can post projects.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {verify === "sent" && (
+                <p className="rounded-md border border-success/30 bg-success/10 px-4 py-3 text-sm">
+                  Check your inbox for a verification link.
+                </p>
+              )}
+              {verify === "invalid" && (
+                <p className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                  That verification link is invalid or has expired. Request a new
+                  one below.
+                </p>
+              )}
+              {verify === "manual" && link && (
+                <div className="rounded-md border border-dashed px-4 py-3 text-sm">
+                  <p className="text-muted-foreground">
+                    Email isn&apos;t configured yet, so use this verification
+                    link directly:
+                  </p>
+                  <a
+                    href={link}
+                    className="mt-1 block break-all text-primary underline"
+                  >
+                    {link}
+                  </a>
+                </div>
+              )}
+              {verify && verify !== "sent" && verify !== "invalid" && verify !== "manual" && (
+                <p className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                  {verify}
+                </p>
+              )}
+
+              <form action={requestVerification} className="flex flex-col gap-2">
+                <Label htmlFor="verifyEmail">Academic or NHS email</Label>
+                <Input
+                  id="verifyEmail"
+                  name="verifyEmail"
+                  type="email"
+                  required
+                  placeholder="you@example.ac.uk"
+                />
+                <Button type="submit" variant="outline" className="self-start">
+                  Send verification link
+                </Button>
+              </form>
+
+              <p className="text-xs text-muted-foreground">
+                Have a different staff email?{" "}
+                <a
+                  href="mailto:hello@bylined.net?subject=Verify%20my%20account"
+                  className="text-primary underline"
+                >
+                  Contact us
+                </a>{" "}
+                and we&apos;ll verify you manually.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </main>

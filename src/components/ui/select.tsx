@@ -53,6 +53,7 @@ export function Select({
   id,
   required,
   className,
+  onValueChange,
 }: {
   name?: string;
   defaultValue?: string;
@@ -61,6 +62,7 @@ export function Select({
   id?: string;
   required?: boolean;
   className?: string;
+  onValueChange?: (value: unknown) => void;
 }) {
   const items = React.useMemo(
     () => Object.fromEntries(options.map((o) => [o.value, o.label])),
@@ -73,6 +75,7 @@ export function Select({
       defaultValue={defaultValue ?? null}
       required={required}
       items={items}
+      onValueChange={onValueChange}
     >
       <BaseSelect.Trigger
         id={id}

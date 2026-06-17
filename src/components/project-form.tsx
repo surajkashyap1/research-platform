@@ -130,6 +130,22 @@ export function ProjectForm({
         Mark as beginner-friendly (gets higher visibility)
       </label>
 
+      <label className="flex items-start gap-2 text-sm">
+        <input
+          type="checkbox"
+          name="isSupervisor"
+          defaultChecked={!!project?.supervisorId}
+          className="mt-0.5 size-4 rounded border-input accent-primary"
+        />
+        <span>
+          I am the supervisor for this project
+          <span className="block text-xs text-muted-foreground">
+            Leave unticked if you&apos;re posting on behalf of a team or aren&apos;t
+            the named supervisor.
+          </span>
+        </span>
+      </label>
+
       <SubmitButton className="self-start" pendingLabel="Saving...">
         {submitLabel}
       </SubmitButton>

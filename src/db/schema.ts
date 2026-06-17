@@ -26,7 +26,8 @@ import {
 // ----------------------------- ENUMS ---------------------------------
 
 export const careerStage = pgEnum("career_stage", [
-  "medical_student", "dental_student", "nursing_student", "other_student",
+  "medical_student", "dental_student", "nursing_student", "masters_student",
+  "phd_student", "other_student",
   "foundation_doctor", "junior_doctor", "registrar", "consultant",
   "dentist", "qualified_nurse", "professor", "postdoc", "staff_grade", "other",
 ]);
@@ -78,6 +79,8 @@ export const profiles = pgTable("profiles", {
   summary: text("summary"),
   university: text("university"),
   careerStage: careerStage("career_stage").notNull().default("other"),
+  careerStageOther: text("career_stage_other"),
+  linkedinUrl: text("linkedin_url"),
   specialty: text("specialty"),
   isVerified: boolean("is_verified").notNull().default(false),
   canSupervise: boolean("can_supervise").notNull().default(false),
@@ -125,9 +128,11 @@ export const verifications = pgTable("verifications", {
   type: verificationType("type").notNull(),
   status: verificationStatus("status").notNull().default("pending"),
   detail: text("detail"),
+  token: text("token"),
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
   verifiedAt: timestamp("verified_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (t) => [index("verifications_token_idx").on(t.token)]);
 
 // --------------------------- PROJECTS --------------------------------
 

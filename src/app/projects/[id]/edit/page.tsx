@@ -24,7 +24,7 @@ export default async function EditProjectPage({
   const user = await requireUser();
   const profile = await ensureProfile(user);
 
-  if (!profile.canSupervise) return <SupervisorRequired />;
+  if (!profile.isVerified) return <SupervisorRequired />;
 
   const project = await getProjectRow(id);
   if (!project) notFound();

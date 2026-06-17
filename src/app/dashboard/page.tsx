@@ -71,7 +71,6 @@ export default async function DashboardPage() {
             Unverified — use a .ac.uk or NHS email to verify
           </Badge>
         )}
-        {profile.canSupervise && <Badge variant="outline">Can supervise</Badge>}
         {profile.isNewResearcher && (
           <Badge variant="secondary">New researcher</Badge>
         )}
@@ -158,7 +157,7 @@ export default async function DashboardPage() {
             >
               Browse all
             </Link>
-            {profile.canSupervise && (
+            {profile.isVerified && (
               <Link
                 href="/projects/new"
                 className={buttonVariants({ size: "sm" })}
@@ -171,7 +170,7 @@ export default async function DashboardPage() {
 
         {myProjects.length === 0 ? (
           <p className="mt-4 rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-            {profile.canSupervise
+            {profile.isVerified
               ? "You haven’t posted any projects yet."
               : "Browse open opportunities to find your first project."}
           </p>

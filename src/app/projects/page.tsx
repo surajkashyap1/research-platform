@@ -40,7 +40,7 @@ export default async function ProjectsPage({
 }) {
   const sp = await searchParams;
   const user = await getSessionUser();
-  const canSupervise = user ? (await getProfile(user.id))?.canSupervise ?? false : false;
+  const canPost = user ? (await getProfile(user.id))?.isVerified ?? false : false;
 
   const rank = COMPETITIVENESS_RANKS.some((r) => r.value === sp.rank)
     ? (sp.rank as CompetitivenessRank)
@@ -65,7 +65,7 @@ export default async function ProjectsPage({
             Browse open opportunities. {projects.length} shown.
           </p>
         </div>
-        {canSupervise && (
+        {canPost && (
           <Link href="/projects/new" className={buttonVariants()}>
             Post a project
           </Link>
@@ -104,7 +104,7 @@ export default async function ProjectsPage({
         <div className="mt-12 rounded-lg border border-dashed p-10 text-center">
           <p className="text-sm text-muted-foreground">
             No projects match. Try clearing filters
-            {canSupervise ? " — or be the first to post one." : "."}
+            {canPost ? " — or be the first to post one." : "."}
           </p>
         </div>
       ) : (

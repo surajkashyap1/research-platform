@@ -58,9 +58,9 @@ export function validateApplication(input: {
   if (!motivation) return "Tell the supervisor why you're interested.";
   if (!suitability) return "Tell the supervisor why you're suitable.";
   if (input.hoursPerWeek == null || input.hoursPerWeek <= 0)
-    return "Tell the supervisor how much time you can dedicate per week.";
+    return "Tell the supervisor how many hours you can dedicate to the role per week.";
   if (input.hoursPerWeek > 80)
-    return "Weekly time commitment must be 80 hours or fewer.";
+    return "Weekly hours must be 80 or fewer.";
   if (countWords(motivation) > WORD_LIMITS.motivation)
     return `Motivation must be ${WORD_LIMITS.motivation} words or fewer.`;
   if (countWords(suitability) > WORD_LIMITS.suitability)

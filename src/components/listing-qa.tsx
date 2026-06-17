@@ -1,7 +1,9 @@
 import { askQuestion, answerQuestion } from "@/app/projects/questions-actions";
 import type { ListingQuestion } from "@/lib/queries/questions";
+import { QUESTION_WORD_LIMIT } from "@/lib/listing-meta";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { WordLimitedField } from "@/components/word-limited-field";
 
 export function ListingQA({
   projectId,
@@ -73,8 +75,12 @@ export function ListingQA({
       {isOpen && isSignedIn && !isOwner && (
         <form action={askQuestion} className="mt-6 flex flex-col gap-2">
           <input type="hidden" name="projectId" value={projectId} />
-          <Textarea
+          <WordLimitedField
+            id="question"
             name="question"
+            label="Ask a public question"
+            max={QUESTION_WORD_LIMIT}
+            multiline
             rows={2}
             required
             placeholder="Ask a public question about this project…"

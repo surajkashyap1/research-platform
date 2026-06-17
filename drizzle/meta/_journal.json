@@ -15,6 +15,13 @@
       "when": 1781538956592,
       "tag": "0001_cold_mesmero",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781726665071,
+      "tag": "0002_nasty_shriek",
+      "breakpoints": true
     }
   ]
 }

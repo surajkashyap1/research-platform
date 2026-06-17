@@ -20,3 +20,12 @@ export function classifyEmail(email: string): EmailClass {
   }
   return { isVerified: false, canSupervise: false, kind: null };
 }
+
+// Domain check for the standalone "Get verified" flow, where a user who signed
+// up with any email proves they hold a recognised academic / NHS address.
+// Returns null for anything we can't auto-verify (use the contact route instead).
+export function verifiableEmailKind(
+  email: string
+): "university" | "nhs" | null {
+  return classifyEmail(email).kind;
+}

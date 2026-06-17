@@ -7,8 +7,9 @@ import { db } from "@/db";
 import { listingQuestions, projects } from "@/db/schema";
 import { requireUser } from "@/lib/auth";
 import { notify } from "@/lib/notify";
+import { countWords } from "@/lib/profile";
+import { QUESTION_WORD_LIMIT } from "@/lib/listing-meta";
 
-const MAX_QUESTION_CHARS = 500;
 const MAX_ANSWER_CHARS = 1000;
 
 function backTo(projectId: string, error?: string): never {
@@ -23,8 +24,8 @@ export async function askQuestion(formData: FormData) {
   const question = String(formData.get("question") ?? "").trim();
   if (!projectId) redirect("/projects");
   if (!question) backTo(projectId, "Question can't be empty.");
-  if (question.length > MAX_QUESTION_CHARS)
-    backTo(projectId, `Keep questions under ${MAX_QUESTION_CHARS} characters.`);
+  if (countWords(question) > QUESTION_WORD_LIMIT)
+    backTo(projectId, `Keep questions to ${QUESTION_WORD_LIMIT} words or fewer.`);
 
   const [project] = await db
     .select({ id: projects.id, status: projects.status, ownerId: projects.ownerId, title: projects.title })
