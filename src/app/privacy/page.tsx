@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Prose } from "@/components/prose";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Bylined",
+  title: "Privacy Policy | Bylined",
   description: "How Bylined collects, uses, and protects your personal data.",
 };
 
@@ -40,7 +40,7 @@ export default function PrivacyPage() {
 
       <h2>How we use it</h2>
       <ul>
-        <li>To operate the marketplace — matching applicants and listers.</li>
+        <li>To operate the marketplace, matching applicants and listers.</li>
         <li>To verify eligibility (e.g. institutional email) and prevent abuse.</li>
         <li>To send service notifications about your applications and messages.</li>
         <li>To understand aggregate usage and improve the platform.</li>

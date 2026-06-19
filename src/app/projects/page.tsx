@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { getSessionUser, getProfile } from "@/lib/auth";
 import {
   listOpenProjects,
@@ -66,7 +67,8 @@ export default async function ProjectsPage({
           </p>
         </div>
         {canPost && (
-          <Link href="/projects/new" className={buttonVariants()}>
+          <Link href="/projects/new" className={buttonVariants({ className: "gap-1.5" })}>
+            <Plus className="h-4 w-4" aria-hidden />
             Post a project
           </Link>
         )}
@@ -104,7 +106,7 @@ export default async function ProjectsPage({
         <div className="mt-12 rounded-lg border border-dashed p-10 text-center">
           <p className="text-sm text-muted-foreground">
             No projects match. Try clearing filters
-            {canPost ? " — or be the first to post one." : "."}
+            {canPost ? ", or be the first to post one." : "."}
           </p>
         </div>
       ) : (

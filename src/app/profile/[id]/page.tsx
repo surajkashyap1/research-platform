@@ -46,7 +46,7 @@ export default async function PublicProfilePage({
   const stageLabel =
     profile.careerStage === "other" && profile.careerStageOther
       ? profile.careerStageOther
-      : CAREER_STAGES.find((s) => s.value === profile.careerStage)?.label ?? "—";
+      : CAREER_STAGES.find((s) => s.value === profile.careerStage)?.label ?? "Not set";
   const isSelf = viewer?.id === id;
 
   return (

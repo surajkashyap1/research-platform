@@ -29,7 +29,9 @@ export const careerStage = pgEnum("career_stage", [
   "medical_student", "dental_student", "nursing_student", "masters_student",
   "phd_student", "other_student",
   "foundation_doctor", "junior_doctor", "registrar", "consultant",
-  "dentist", "qualified_nurse", "professor", "postdoc", "staff_grade", "other",
+  "dentist", "qualified_nurse", "physician_associate",
+  "advanced_clinical_practitioner", "physiotherapist", "pharmacist",
+  "professor", "postdoc", "staff_grade", "other",
 ]);
 
 export const experienceLevel = pgEnum("experience_level", [

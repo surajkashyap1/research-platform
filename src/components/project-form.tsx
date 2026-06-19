@@ -92,7 +92,7 @@ export function ProjectForm({
             name="roleCategory"
             defaultValue={project?.roleCategory ?? ""}
             options={[
-              { value: "", label: "— None —" },
+              { value: "", label: "None" },
               ...ROLE_CATEGORIES.map((r) => ({ value: r, label: r })),
             ]}
           />

@@ -45,7 +45,7 @@ function ScoreBreakdown({ ranking }: { ranking: RankingResult }) {
         ))}
       </dl>
       <p className="mt-2 text-xs text-muted-foreground">
-        A guide, not a verdict — beginners are boosted and prior experience is
+        A guide, not a verdict. Beginners are boosted and prior experience is
         weighted lightly. You decide.
       </p>
     </details>

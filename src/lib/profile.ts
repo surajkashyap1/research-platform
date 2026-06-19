@@ -83,8 +83,12 @@ export const CAREER_STAGES: { value: Profile["careerStage"]; label: string }[] =
   { value: "consultant", label: "Consultant" },
   { value: "dentist", label: "Dentist" },
   { value: "qualified_nurse", label: "Nurse" },
+  { value: "physician_associate", label: "Physician Associate" },
+  { value: "advanced_clinical_practitioner", label: "Advanced Clinical Practitioner" },
+  { value: "physiotherapist", label: "Physiotherapist" },
+  { value: "pharmacist", label: "Pharmacist" },
   { value: "professor", label: "Professor" },
   { value: "postdoc", label: "Postdoctoral researcher" },
-  { value: "staff_grade", label: "Staff grade" },
+  { value: "staff_grade", label: "University staff grade" },
   { value: "other", label: "Other" },
 ];

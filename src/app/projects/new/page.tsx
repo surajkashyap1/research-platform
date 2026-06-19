@@ -28,7 +28,7 @@ export default async function NewProjectPage({
           <CardTitle>Post a project</CardTitle>
           <CardDescription>
             Listing is free. Be clear about the work and what collaborators get out
-            of it — beginner-friendly projects get more visibility.
+            of it. Beginner-friendly projects get more visibility.
           </CardDescription>
         </CardHeader>
         <CardContent>

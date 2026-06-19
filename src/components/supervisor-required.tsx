@@ -19,7 +19,7 @@ export function SupervisorRequired() {
           <CardTitle>Verify your account to post</CardTitle>
           <CardDescription>
             Posting a project requires a verified account. Verify with a{" "}
-            <strong>.ac.uk</strong> or <strong>.nhs.uk</strong> email — you can
+            <strong>.ac.uk</strong> or <strong>.nhs.uk</strong> email. You can
             use a different address from the one you signed up with.
           </CardDescription>
         </CardHeader>

@@ -164,13 +164,13 @@ export default async function ProjectDetailPage({
           <DetailField
             icon={Stethoscope}
             label="Specialty"
-            value={project.specialty ?? "—"}
+            value={project.specialty ?? "Not set"}
             className="border-emerald-200 bg-emerald-50 dark:border-emerald-900/60 dark:bg-emerald-950/40"
           />
           <DetailField
             icon={Briefcase}
             label="Role"
-            value={project.roleCategory ?? "—"}
+            value={project.roleCategory ?? "Not set"}
             className="border-violet-200 bg-violet-50 dark:border-violet-900/60 dark:bg-violet-950/40"
           />
           <DetailField
@@ -188,7 +188,7 @@ export default async function ProjectDetailPage({
           <DetailField
             icon={CalendarDays}
             label="Application Deadline"
-            value={project.applicationDeadline ?? "—"}
+            value={project.applicationDeadline ?? "Not set"}
             className="border-rose-200 bg-rose-50 dark:border-rose-900/60 dark:bg-rose-950/40"
           />
           <DetailField

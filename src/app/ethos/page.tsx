@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Prose } from "@/components/prose";
 
 export const metadata: Metadata = {
-  title: "Ethos & Usage Policy — Bylined",
+  title: "Ethos and Usage Policy | Bylined",
   description:
     "How we build trust, prevent spam, and keep Bylined welcoming to beginners.",
 };
@@ -15,7 +15,7 @@ export default function EthosPage() {
     >
       <p>
         This platform is free to use for everyone. By using Bylined you agree to
-        take part in good faith — apply to projects you genuinely intend to
+        take part in good faith. Apply to projects you genuinely intend to
         complete, communicate honestly, and treat collaborators and supervisors
         with respect.
       </p>
@@ -24,7 +24,7 @@ export default function EthosPage() {
       <p>
         We want to avoid situations where everyone applies to every project, which
         reduces the quality of applications and increases ghosting. Commitment to a
-        project is essential to seeing it through — they take significant time and
+        project is essential to seeing it through, as they take significant time and
         effort. So we want you to apply to projects you find interesting, that are
         useful for your future career, and that you can realistically see yourself
         completing.
@@ -49,7 +49,7 @@ export default function EthosPage() {
       <h2>Accessibility for beginners</h2>
       <p>
         The barrier to entry can feel high because projects often look for people
-        with experience — but we all start without any. We promote those who are
+        with experience, but we all start without any. We promote those who are
         new to research, every project states whether it is beginner-friendly, and
         listers who support beginners earn recognition such as the Research Mentor
         badge. Everyone needed a first project once.

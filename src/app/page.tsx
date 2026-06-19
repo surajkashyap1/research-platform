@@ -39,7 +39,7 @@ export default async function Home() {
 
       <dl className="mt-16 grid gap-6 border-t pt-10 sm:grid-cols-3">
         {[
-          ["Find opportunities", "Audits, reviews, case studies and posters — filtered by experience level."],
+          ["Find opportunities", "Audits, reviews, case studies and posters, filtered by experience level."],
           ["Built for beginners", "Beginner-friendly roles and a New Researcher badge. Everyone starts somewhere."],
           ["Build trust", "Reviews and reliability scores from real projects, shown on your profile."],
         ].map(([title, body]) => (

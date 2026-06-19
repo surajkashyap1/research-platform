@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Prose } from "@/components/prose";
 
 export const metadata: Metadata = {
-  title: "About — Bylined",
+  title: "About Bylined",
   description:
     "Why Bylined exists: making research opportunities accessible to all UK students and healthcare workers, not only the well-connected.",
 };
@@ -19,7 +19,7 @@ export default function AboutPage() {
         allied healthcare disciplines. Competition is rapidly increasing with the
         availability of AI tools, and portfolio requirements change every year.
         However, finding opportunities for research, audits and posters is often
-        difficult — strategies include cold-emailing potential supervisors,
+        difficult. Common strategies include cold-emailing potential supervisors,
         WhatsApp groups, asking friends, societies, word of mouth, and having good
         connections.
       </p>
@@ -34,8 +34,8 @@ export default function AboutPage() {
         streamline things.
       </p>
       <p>
-        The aim of this platform is to have a space where people — student or
-        supervisor — can post research opportunities. The opportunity may already
+        The aim of this platform is to have a space where anyone, whether student
+        or supervisor, can post research opportunities. The opportunity may already
         have an established supervisor with a project idea. Alternatively, neither
         may be established, and the lister simply needs collaborators with similar
         goals so they can plan projects together and contact appropriate
@@ -47,7 +47,7 @@ export default function AboutPage() {
         are started, timelines tend to drag on, expectations from students and
         supervisors are unclear, motivation is lost, and projects fall apart. For
         situations like these, there will be other students interested in the
-        project who can pick up where it was left off — and such opportunities will
+        project who can pick up where it was left off, and such opportunities will
         also be posted.
       </p>
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { requireUser, ensureProfile } from "@/lib/auth";
 import { CAREER_STAGES } from "@/lib/profile";
 import { getProjectsByOwner } from "@/lib/queries/projects";
@@ -68,7 +69,7 @@ export default async function DashboardPage() {
           </Badge>
         ) : (
           <Badge variant="secondary">
-            Unverified — use a .ac.uk or NHS email to verify
+            Unverified. Verify with a .ac.uk or NHS email.
           </Badge>
         )}
         {profile.isNewResearcher && (
@@ -100,30 +101,30 @@ export default async function DashboardPage() {
             </div>
             <div>
               <dt className="text-muted-foreground">University</dt>
-              <dd className="mt-0.5 font-medium">{profile.university ?? "—"}</dd>
+              <dd className="mt-0.5 font-medium">{profile.university ?? "Not set"}</dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Specialty</dt>
-              <dd className="mt-0.5 font-medium">{profile.specialty ?? "—"}</dd>
+              <dd className="mt-0.5 font-medium">{profile.specialty ?? "Not set"}</dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Availability</dt>
               <dd className="mt-0.5 font-medium">
                 {profile.availabilityHoursPerWeek != null
                   ? `${profile.availabilityHoursPerWeek} hrs/week`
-                  : "—"}
+                  : "Not set"}
               </dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Looking for</dt>
               <dd className="mt-0.5 font-medium">
-                {profile.preferredProjectTypes ?? "—"}
+                {profile.preferredProjectTypes ?? "Not set"}
               </dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Preferred specialties</dt>
               <dd className="mt-0.5 font-medium">
-                {profile.preferredSpecialties ?? "—"}
+                {profile.preferredSpecialties ?? "Not set"}
               </dd>
             </div>
           </dl>
@@ -131,7 +132,7 @@ export default async function DashboardPage() {
             <div>
               <p className="text-muted-foreground">Skills</p>
               <p className="mt-0.5 font-medium">
-                {skillNames.length > 0 ? skillNames.join(", ") : "—"}
+                {skillNames.length > 0 ? skillNames.join(", ") : "Not set"}
               </p>
             </div>
             <div>
@@ -139,7 +140,7 @@ export default async function DashboardPage() {
               <p className="mt-0.5 font-medium">
                 {certifications.length > 0
                   ? certifications.map((certification) => certification.name).join(", ")
-                  : "—"}
+                  : "Not set"}
               </p>
             </div>
           </div>
@@ -160,8 +161,9 @@ export default async function DashboardPage() {
             {profile.isVerified && (
               <Link
                 href="/projects/new"
-                className={buttonVariants({ size: "sm" })}
+                className={buttonVariants({ size: "sm", className: "gap-1.5" })}
               >
+                <Plus className="h-4 w-4" aria-hidden />
                 Post a project
               </Link>
             )}

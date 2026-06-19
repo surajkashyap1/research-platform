@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Prose } from "@/components/prose";
 
 export const metadata: Metadata = {
-  title: "Terms of Use — Bylined",
+  title: "Terms of Use | Bylined",
   description: "The terms governing your use of Bylined.",
 };
 
